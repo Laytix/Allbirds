@@ -1,0 +1,299 @@
+<div class="featured-collections">
+  {%- for i in (1..4) -%}
+    {%- assign image_setting  = 'image_'  | append: i -%}
+    {%- assign title_setting  = 'title_'  | append: i -%}
+    {%- assign col_a_setting  = 'col_'    | append: i | append: '_a' -%}
+    {%- assign col_b_setting  = 'col_'    | append: i | append: '_b' -%}
+
+    {%- assign card_image  = section.settings[image_setting] -%}
+    {%- assign card_title  = section.settings[title_setting] | default: 'Collection' -%}
+    {%- assign col_a       = collections[section.settings[col_a_setting]] -%}
+    {%- assign col_b       = collections[section.settings[col_b_setting]] -%}
+
+    {%- assign has_col_a = false -%}
+    {%- assign has_col_b = false -%}
+    {%- if section.settings[col_a_setting] != blank and col_a != empty -%}
+      {%- assign has_col_a = true -%}
+    {%- endif -%}
+    {%- if section.settings[col_b_setting] != blank and col_b != empty -%}
+      {%- assign has_col_b = true -%}
+    {%- endif -%}
+
+    <div class="featured-collections__item">
+
+      {%- comment -%} Image {%- endcomment -%}
+      {%- if card_image -%}
+        {{
+          card_image
+          | image_url: width: 800
+          | image_tag:
+            loading: 'lazy',
+            class: 'featured-collections__img',
+            widths: '400,600,800',
+            sizes: '(max-width: 640px) calc(50vw - 1.125rem), (max-width: 1024px) calc(25vw - 1.125rem), calc(25vw - 1.5rem)'
+        }}
+      {%- else -%}
+        <div class="featured-collections__placeholder"></div>
+      {%- endif -%}
+
+      {%- comment -%} Overlay with title + hover collection links {%- endcomment -%}
+      <div class="featured-collections__overlay">
+
+        {%- comment -%} Default label — fades up and out on hover {%- endcomment -%}
+        <div class="featured-collections__default">
+          <span class="featured-collections__pill">{{ card_title }}</span>
+        </div>
+
+        {%- comment -%} Hover state — collection(s) fade up into view {%- endcomment -%}
+        <div class="featured-collections__hover">
+          {%- if has_col_a -%}
+            <a href="{{ col_a.url }}" class="featured-collections__pill featured-collections__pill--link">
+              {{ col_a.title }}
+            </a>
+          {%- endif -%}
+          {%- if has_col_b -%}
+            <a href="{{ col_b.url }}" class="featured-collections__pill featured-collections__pill--link">
+              {{ col_b.title }}
+            </a>
+          {%- endif -%}
+          {%- unless has_col_a or has_col_b -%}
+            <span class="featured-collections__pill">{{ card_title }}</span>
+          {%- endunless -%}
+        </div>
+
+      </div>
+    </div>
+  {%- endfor -%}
+</div>
+
+{% stylesheet %}
+  .featured-collections {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    margin: 0.75rem;
+    width: calc(100% - 1.5rem);
+  }
+
+  .featured-collections__item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    aspect-ratio: 3 / 4;
+    background: #1a1a1a;
+    cursor: pointer;
+  }
+
+  /* ── Image ── */
+  .featured-collections__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .featured-collections__item:hover .featured-collections__img {
+    transform: scale(1.04);
+  }
+
+  .featured-collections__placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1c1c1c 0%, #2e2e2e 50%, #1c1c1c 100%);
+  }
+
+  /* ── Overlay — subtle tint, deepens on hover ── */
+  .featured-collections__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.18);
+    transition: background 0.4s ease;
+  }
+
+  .featured-collections__item:hover .featured-collections__overlay {
+    background: rgba(0, 0, 0, 0.38);
+  }
+
+  /* ── Both layers: centered, absolutely positioned ── */
+  .featured-collections__default,
+  .featured-collections__hover {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    transition: opacity 0.38s ease, transform 0.38s ease;
+  }
+
+  /* Default: centered, fully visible */
+  .featured-collections__default {
+    opacity: 1;
+    transform: translateY(-50%);
+  }
+
+  /* Hover layer: starts centered but shifted down slightly, hidden */
+  .featured-collections__hover {
+    opacity: 0;
+    transform: translateY(calc(-50% + 12px));
+  }
+
+  /* On hover: default fades up and out */
+  .featured-collections__item:hover .featured-collections__default {
+    opacity: 0;
+    transform: translateY(calc(-50% - 12px));
+  }
+
+  /* On hover: collection links fade up into center */
+  .featured-collections__item:hover .featured-collections__hover {
+    opacity: 1;
+    transform: translateY(-50%);
+  }
+
+  /* ── Pill base ── */
+  .featured-collections__pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
+    background: transparent;
+    color: #ffffff;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  /* Collection link pills get a subtle fill on their own hover */
+  .featured-collections__pill--link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #ffffff;
+  }
+
+  /* Tablet: 2 columns */
+  @media (max-width: 768px) {
+    .featured-collections {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Featured Collections",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Card 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "title_1",
+      "label": "Title",
+      "default": "Men"
+    },
+    {
+      "type": "collection",
+      "id": "col_1_a",
+      "label": "Collection A"
+    },
+    {
+      "type": "collection",
+      "id": "col_1_b",
+      "label": "Collection B"
+    },
+    {
+      "type": "header",
+      "content": "Card 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "title_2",
+      "label": "Title",
+      "default": "Women"
+    },
+    {
+      "type": "collection",
+      "id": "col_2_a",
+      "label": "Collection A"
+    },
+    {
+      "type": "collection",
+      "id": "col_2_b",
+      "label": "Collection B"
+    },
+    {
+      "type": "header",
+      "content": "Card 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "title_3",
+      "label": "Title",
+      "default": "Accessories"
+    },
+    {
+      "type": "collection",
+      "id": "col_3_a",
+      "label": "Collection A"
+    },
+    {
+      "type": "collection",
+      "id": "col_3_b",
+      "label": "Collection B"
+    },
+    {
+      "type": "header",
+      "content": "Card 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_4",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "title_4",
+      "label": "Title",
+      "default": "Sale"
+    },
+    {
+      "type": "collection",
+      "id": "col_4_a",
+      "label": "Collection A"
+    },
+    {
+      "type": "collection",
+      "id": "col_4_b",
+      "label": "Collection B"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Collections"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,43 @@
+/* Tailwind CSS v4 — Source file */
+/* Output: assets/application.css (built via CLI, never edit output directly) */
+
+/* Google Fonts must come before all other rules */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* Import Tailwind theme variables and utilities WITHOUT preflight reset.
+   Horizon has its own CSS reset (base.css) — Tailwind's preflight would
+   conflict with Horizon's header, navigation, and typography styles. */
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/utilities" layer(utilities);
+
+/* Flowbite plugin integration */
+@plugin "flowbite/plugin";
+
+/* Tell Tailwind to scan Flowbite's source for utility classes */
+@source "../node_modules/flowbite";
+
+/* ===== Alpine.js cloak (prevents flash of unstyled content) ===== */
+[x-cloak] {
+  display: none !important;
+}
+
+/* ===== Custom theme overrides ===== */
+/* Add your custom @theme or @layer rules below */
+
+/*
+@theme {
+  --color-brand: #your-brand-color;
+  --color-brand-light: #lighter;
+  --color-brand-dark: #darker;
+  --font-sans: 'Inter', sans-serif;
+}
+*/
+
+/* ===== Component abstractions (use sparingly) ===== */
+/*
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium;
+  }
+}
+*/

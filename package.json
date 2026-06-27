@@ -1,0 +1,19 @@
+{
+  "name": "shopify-theme",
+  "version": "1.0.0",
+  "description": "Shopify theme with Tailwind CSS, Alpine.js, and Flowbite",
+  "scripts": {
+    "dev": "concurrently -n tailwind,shopify -c blue,green \"npm run dev:tailwind\" \"npm run dev:shopify\"",
+    "dev:tailwind": "npx @tailwindcss/cli -i ./tailwind-input.css -o ./assets/application.css --watch",
+    "dev:shopify": "shopify theme dev",
+    "build": "npx @tailwindcss/cli -i ./tailwind-input.css -o ./assets/application.css --minify",
+    "deploy": "npm run build && shopify theme push",
+    "claude": "claude mcp add flowbite -- npx -y flowbite-mcp"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.0",
+    "concurrently": "^9.1.0",
+    "flowbite": "^4.0.1",
+    "tailwindcss": "^4.1.0"
+  }
+}

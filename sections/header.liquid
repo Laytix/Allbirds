@@ -1,0 +1,105 @@
+<header>
+  <h2 class="header__title">
+    {{ shop.name | link_to: routes.root_url }}
+  </h2>
+
+  <div class="header__menu">
+    {% for link in section.settings.menu.links %}
+      {{ link.title | link_to: link.url }}
+    {% endfor %}
+  </div>
+
+  <div class="header__icons">
+    {% if shop.customer_accounts_enabled %}
+      <shopify-account menu="{{ section.settings.customer_account_menu }}">
+        {{ 'icon-account.svg' | inline_asset_content }}
+      </shopify-account>
+    {% endif %}
+
+    <a href="{{ routes.cart_url }}">
+      {% if cart.item_count > 0 %}
+        <sup>{{ cart.item_count }}</sup>
+      {% endif %}
+
+      {{ 'icon-cart.svg' | inline_asset_content }}
+    </a>
+  </div>
+</header>
+
+{% stylesheet %}
+  header {
+    position: fixed;
+    /* Slider sits at 0.75rem from viewport edges; header inset a further 0.5rem inside */
+    top: 1.25rem;
+    left: 1.25rem;
+    right: 1.25rem;
+    z-index: 50;
+    height: 3rem;
+    padding: 0 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  header,
+  header h2,
+  header h2 a,
+  header .header__menu a,
+  header .header__icons a,
+  header .header__icons shopify-account {
+    color: var(--color-foreground);
+    text-decoration: none;
+  }
+
+  header a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  header a sup {
+    position: absolute;
+    left: 100%;
+    overflow: hidden;
+    max-width: var(--page-margin);
+  }
+
+  header .header__title {
+    font-weight: bold;
+  }
+
+  header svg {
+    width: 1.75rem;
+    fill: var(--color-foreground);
+    color: var(--color-foreground);
+  }
+
+  header .header__menu,
+  header .header__icons {
+    display: flex;
+    gap: 1rem;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.header",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "t:labels.menu"
+    },
+    {
+      "type": "link_list",
+      "id": "customer_account_menu",
+      "label": "t:labels.customer_account_menu",
+      "default": "customer-account-main-menu"
+    }
+  ]
+}
+{% endschema %}
