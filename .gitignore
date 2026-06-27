@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Shopify CLI
+.shopify/
+*.shopifyignore
+
+# Generated assets (Tailwind output)
+assets/application.css
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build output
+dist/
+build/
+
+# Config files (not needed in git — generated or environment-specific)
+postcss.config.js
