@@ -1,57 +1,454 @@
-<footer>
-  <div class="footer__copyright">
-    &copy;
-    {{ 'now' | date: '%Y' }}
-    {{ shop.name | link_to: routes.root_url }}, {{ powered_by_link }}
+{%- comment -%}
+  Section: Footer
+  Description: Allbirds-inspired bold black footer with newsletter, dynamic
+  navigation columns (via theme blocks), social media icons, and bottom bar.
+{%- endcomment -%}
+
+{%- liquid
+  assign bg = section.settings.background_color
+  assign text = section.settings.text_color
+  assign accent = section.settings.accent_color
+  assign has_social =
+    section.settings.social_instagram != blank
+    or section.settings.social_pinterest != blank
+    or section.settings.social_facebook != blank
+    or section.settings.social_tiktok != blank
+    or section.settings.social_youtube != blank
+-%}
+
+<footer
+  class="site-footer w-full"
+  style="--footer-bg: {{ bg }}; --footer-text: {{ text }}; --footer-accent: {{ accent }};"
+>
+  {%- comment -%} Brand statement {%- endcomment -%}
+  {% if section.settings.brand_statement != blank %}
+    <div class="px-6 pt-12 pb-4 text-center">
+      <p class="site-footer__brand text-lg md:text-xl font-semibold">
+        {{ section.settings.brand_statement }}
+      </p>
+    </div>
+  {% endif %}
+
+  {%- comment -%} Newsletter {%- endcomment -%}
+  {% if section.settings.show_newsletter %}
+    <div
+      class="site-footer__newsletter px-6 py-8{% if section.settings.brand_statement == blank %} pt-12{% endif %}"
+      x-data="{ newsletterSuccess: false }"
+    >
+      {% if form.posted_successfully? %}
+        <div x-init="newsletterSuccess = true"></div>
+      {% endif %}
+
+      <div class="max-w-md mx-auto text-center">
+        <h3 class="text-sm font-semibold tracking-wider uppercase mb-4">
+          {{ section.settings.newsletter_heading }}
+        </h3>
+
+        <div x-show="!newsletterSuccess">
+          {% form 'customer' %}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <div class="flex flex-col sm:flex-row gap-3">
+              <input
+                type="email"
+                name="contact[email]"
+                class="site-footer__input flex-1 px-4 py-3 text-sm border rounded-none bg-transparent"
+                placeholder="{{ 'general.newsletter_form.newsletter_email' | t }}"
+                aria-label="{{ 'general.newsletter_form.newsletter_email' | t }}"
+                required
+              >
+              <button
+                type="submit"
+                class="site-footer__btn px-8 py-3 text-sm font-semibold uppercase tracking-wider border rounded-none transition-colors duration-200"
+              >
+                {{ 'general.newsletter_form.submit' | t }}
+              </button>
+            </div>
+          {% endform %}
+        </div>
+
+        <div x-show="newsletterSuccess" x-cloak class="py-4">
+          <p class="text-sm opacity-80">
+            {{ section.settings.newsletter_success_message }}
+          </p>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {%- comment -%} Divider {%- endcomment -%}
+  <div class="site-footer__divider mx-6"></div>
+
+  {%- comment -%} Blocks — footer-column entries + any @theme blocks {%- endcomment -%}
+  <div class="px-6 py-10">
+    <div class="site-footer__blocks">
+      {% content_for 'blocks' %}
+    </div>
   </div>
 
-  <div class="footer__links">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
+  {%- comment -%} Social media links {%- endcomment -%}
+  {% if section.settings.show_social_links and has_social %}
+    <div class="site-footer__divider mx-6"></div>
+    <div class="px-6 py-8">
+      <h3 class="text-sm font-semibold tracking-wider uppercase mb-6 text-center">
+        {{ section.settings.social_heading }}
+      </h3>
+      <div class="flex justify-center gap-5 flex-wrap">
+        {% if section.settings.social_instagram != blank %}
+          <a
+            href="{{ section.settings.social_instagram }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="site-footer__social-icon transition-transform duration-200 hover:scale-110"
+            aria-label="Instagram"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+          </a>
+        {% endif %}
+        {% if section.settings.social_pinterest != blank %}
+          <a
+            href="{{ section.settings.social_pinterest }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="site-footer__social-icon transition-transform duration-200 hover:scale-110"
+            aria-label="Pinterest"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+            </svg>
+          </a>
+        {% endif %}
+        {% if section.settings.social_facebook != blank %}
+          <a
+            href="{{ section.settings.social_facebook }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="site-footer__social-icon transition-transform duration-200 hover:scale-110"
+            aria-label="Facebook"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+            </svg>
+          </a>
+        {% endif %}
+        {% if section.settings.social_tiktok != blank %}
+          <a
+            href="{{ section.settings.social_tiktok }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="site-footer__social-icon transition-transform duration-200 hover:scale-110"
+            aria-label="TikTok"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
+            </svg>
+          </a>
+        {% endif %}
+        {% if section.settings.social_youtube != blank %}
+          <a
+            href="{{ section.settings.social_youtube }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="site-footer__social-icon transition-transform duration-200 hover:scale-110"
+            aria-label="YouTube"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29.94 29.94 0 0 0 1 12a29.94 29.94 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 2C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29.94 29.94 0 0 0 23 12a29.94 29.94 0 0 0-.46-5.58z"></path>
+              <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"></polygon>
+            </svg>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
 
-  <div class="footer__payment">
-    {% if section.settings.show_payment_icons %}
-      {% for type in shop.enabled_payment_types %}
-        {{ type | payment_type_svg_tag }}
-      {% endfor %}
-    {% endif %}
+  {%- comment -%} Bottom bar — copyright, legal, payment icons {%- endcomment -%}
+  <div class="site-footer__divider mx-6"></div>
+  <div class="px-6 py-6">
+    <div class="site-footer__bottom flex flex-col md:flex-row items-center justify-between gap-4 text-xs opacity-60">
+      <div class="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-center md:text-left">
+        <span>
+          {%- if section.settings.copyright_text != blank -%}
+            {{ section.settings.copyright_text }}
+          {%- else -%}
+            &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}
+          {%- endif -%}
+        </span>
+
+        {% if section.settings.legal_menu != blank %}
+          <div class="flex items-center gap-2 md:gap-4">
+            {% for link in section.settings.legal_menu.links %}
+              <a
+                href="{{ link.url }}"
+                class="hover:opacity-100 transition-opacity duration-200 no-underline"
+              >
+                {{ link.title }}
+              </a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      {% if section.settings.show_payment_icons %}
+        <div class="site-footer__payment flex flex-wrap justify-center gap-2">
+          {% for type in shop.enabled_payment_types %}
+            {{ type | payment_type_svg_tag }}
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
   </div>
 </footer>
 
 {% stylesheet %}
-  footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
+  .site-footer {
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
+    font-family: var(--font-primary--family, inherit);
   }
-  footer a {
-    text-decoration: none;
-    color: var(--color-foreground);
+
+  .site-footer__brand {
+    color: var(--footer-text);
   }
-  footer .footer__links,
-  footer .footer__payment {
-    display: flex;
-    gap: 1rem;
+
+  .site-footer__input {
+    border-color: var(--footer-text);
+    color: var(--footer-text);
+    opacity: 0.6;
+    border-width: 1px;
+    outline: none;
+  }
+
+  .site-footer__input::placeholder {
+    color: var(--footer-text);
+    opacity: 0.4;
+  }
+
+  .site-footer__input:focus {
+    opacity: 0.9;
+    border-color: var(--footer-accent);
+  }
+
+  .site-footer__btn {
+    background-color: var(--footer-accent);
+    color: var(--footer-bg);
+    border-color: var(--footer-accent);
+    cursor: pointer;
+  }
+
+  .site-footer__btn:hover {
+    background-color: color-mix(in srgb, var(--footer-accent) 85%, transparent);
+    border-color: color-mix(in srgb, var(--footer-accent) 85%, transparent);
+  }
+
+  .site-footer__divider {
+    height: 1px;
+    background: color-mix(in srgb, var(--footer-text) 10%, transparent);
+  }
+
+  .site-footer__blocks {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .site-footer__blocks {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+  }
+
+  .site-footer__social-icon {
+    color: var(--footer-text);
+    opacity: 0.6;
+  }
+
+  .site-footer__social-icon:hover {
+    opacity: 1;
+    color: var(--footer-accent);
+  }
+
+  .site-footer__payment svg {
+    height: 24px;
+    width: auto;
+  }
+
+  .site-footer a,
+  .site-footer a:visited,
+  .site-footer a:active {
+    color: inherit;
   }
 {% endstylesheet %}
 
 {% schema %}
 {
   "name": "t:general.footer",
+  "tag": "footer",
+  "class": "site-footer",
   "settings": [
     {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#A8D8B9"
+    },
+    {
+      "type": "header",
+      "content": "Brand"
+    },
+    {
+      "type": "text",
+      "id": "brand_statement",
+      "label": "Brand statement",
+      "default": ""
+    },
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "Show newsletter signup",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "Newsletter heading",
+      "default": "Subscribe to our emails"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_success_message",
+      "label": "Success message",
+      "default": "Thanks for subscribing!"
+    },
+    {
+      "type": "header",
+      "content": "Social media"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social_links",
+      "label": "Show social links",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "social_heading",
+      "label": "Social heading",
+      "default": "Follow The Flock"
+    },
+    {
+      "type": "url",
+      "id": "social_instagram",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "url",
+      "id": "social_pinterest",
+      "label": "Pinterest URL"
+    },
+    {
+      "type": "url",
+      "id": "social_facebook",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "url",
+      "id": "social_tiktok",
+      "label": "TikTok URL"
+    },
+    {
+      "type": "url",
+      "id": "social_youtube",
+      "label": "YouTube URL"
+    },
+    {
+      "type": "header",
+      "content": "Bottom bar"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright text",
+      "default": "",
+      "info": "Leave blank to auto-generate: © YEAR Shop Name"
+    },
+    {
       "type": "link_list",
-      "id": "menu",
-      "label": "t:labels.menu"
+      "id": "legal_menu",
+      "label": "Legal links"
     },
     {
       "type": "checkbox",
       "id": "show_payment_icons",
-      "label": "t:labels.show_payment_icons",
+      "label": "Show payment icons",
       "default": true
     }
-  ]
+  ],
+  "blocks": [
+    { "type": "footer-column" },
+    { "type": "group" },
+    { "type": "@theme" }
+  ],
+  "default": {
+    "settings": {
+      "background_color": "#000000",
+      "text_color": "#FFFFFF",
+      "accent_color": "#A8D8B9",
+      "show_newsletter": true,
+      "newsletter_heading": "Subscribe to our emails",
+      "newsletter_success_message": "Thanks for subscribing!",
+      "show_social_links": true,
+      "social_heading": "Follow The Flock",
+      "show_payment_icons": true
+    },
+    "blocks": [
+      {
+        "type": "footer-column",
+        "settings": {
+          "heading": "Help"
+        }
+      },
+      {
+        "type": "footer-column",
+        "settings": {
+          "heading": "Shop"
+        }
+      },
+      {
+        "type": "footer-column",
+        "settings": {
+          "heading": "Company"
+        }
+      }
+    ]
+  },
+  "enabled_on": {
+    "groups": ["footer"]
+  }
 }
 {% endschema %}
