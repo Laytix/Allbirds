@@ -62,12 +62,12 @@
               type="email"
               name="contact[email]"
               class="site-footer__input"
-              placeholder="{{ 'general.newsletter_form.newsletter_email' | t }}"
-              aria-label="{{ 'general.newsletter_form.newsletter_email' | t }}"
+              placeholder="Email address"
+                aria-label="Email address"
               required
             >
             <button type="submit" class="site-footer__btn">
-              <span>{{ 'general.newsletter_form.submit' | t }}</span>
+              <span>Sign Up</span>
               <svg class="site-footer__btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M5 12h14M12 5l7 7-7 7"/>
               </svg>
@@ -186,6 +186,8 @@
     color: var(--footer-text);
     font-family: var(--font-primary--family, inherit);
     overflow: hidden;
+    border-top-left-radius: 2rem;
+    border-top-right-radius: 2rem;
   }
 
   /* ===== Brand ===== */

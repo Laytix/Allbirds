@@ -1,25 +1,35 @@
 {%- comment -%}
   Block: footer-column
   Description: Navigation column for the footer with heading and links.
-  On mobile (< 768px), collapses into an accordion toggle. On desktop,
+  On mobile (< 768px), collapses into a Flowbite accordion. On desktop,
   links are always visible.
 {%- endcomment -%}
 
 <div
   class="footer-column"
-  x-data="{ open: false }"
+  data-accordion="collapse"
   {{ block.shopify_attributes }}
 >
   <button
+    type="button"
     class="footer-column__toggle"
-    @click="open = !open"
-    :aria-expanded="open"
+    data-accordion-target="#footer-col-{{ block.id }}"
+    aria-expanded="false"
+    aria-controls="footer-col-{{ block.id }}"
   >
     <span>{{ block.settings.heading }}</span>
-    <span
-      x-text="open ? '\u2212' : '+'"
+    <svg
+      data-accordion-icon
       class="footer-column__toggle-icon"
-    ></span>
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="3"
+    >
+      <path d="M6 9l6 6 6-6"/>
+    </svg>
   </button>
 
   <h3 class="footer-column__heading">
@@ -27,18 +37,12 @@
   </h3>
 
   <ul
+    id="footer-col-{{ block.id }}"
     class="footer-column__links"
-    x-show="open"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 -translate-y-1"
-    x-transition:enter-end="opacity-100 translate-y-0"
-    x-transition:leave="transition ease-in duration-150"
-    x-transition:leave-start="opacity-100 translate-y-0"
-    x-transition:leave-end="opacity-0 -translate-y-1"
-    x-cloak
+    hidden
   >
     {% for link in block.settings.menu.links %}
-      <li class="footer-column__link-item">
+      <li>
         <a href="{{ link.url }}" class="footer-column__link">
           {{ link.title }}
         </a>
@@ -73,13 +77,19 @@
   }
 
   .footer-column__toggle-icon {
-    font-size: 1.25rem;
-    font-weight: 300;
+    width: 14px;
+    height: 14px;
     opacity: 0.5;
-    transition: opacity 0.2s ease;
+    transition: transform 0.3s ease, opacity 0.2s ease;
+    flex-shrink: 0;
   }
 
   .footer-column__toggle:hover .footer-column__toggle-icon {
+    opacity: 1;
+  }
+
+  /* Flowbite rotates the icon when open */
+  [data-accordion].footer-column [aria-expanded="true"] .footer-column__toggle-icon {
     opacity: 1;
   }
 
@@ -99,10 +109,6 @@
     list-style: none;
     padding: 0 0 1.25rem 0;
     margin: 0;
-  }
-
-  .footer-column__link-item {
-    /* spacing handled by link padding */
   }
 
   .footer-column__link {
@@ -133,6 +139,17 @@
     .footer-column__links {
       display: block !important;
       padding-bottom: 0;
+    }
+
+    .footer-column__links[hidden] {
+      display: block !important;
+    }
+  }
+
+  /* Remove the hidden attribute visually on desktop */
+  @media (min-width: 768px) {
+    .footer-column[data-accordion="collapse"] [hidden] {
+      display: block !important;
     }
   }
 {% endstylesheet %}
