@@ -1,7 +1,7 @@
 {%- comment -%}
   Section: Footer
-  Description: Allbirds-inspired bold black footer with newsletter, dynamic
-  navigation columns (via theme blocks), social media icons, and bottom bar.
+  Description: Bold Allbirds-inspired footer — dramatic typography, generous spacing,
+  premium newsletter section, prominent social icons, elevated bottom bar.
 {%- endcomment -%}
 
 {%- assign bg = section.settings.background_color -%}
@@ -21,165 +21,136 @@
 {%- endif -%}
 
 <footer
-  class="site-footer w-full"
+  class="site-footer"
   style="--footer-bg: {{ bg }}; --footer-text: {{ text }}; --footer-accent: {{ accent }};"
 >
-  {%- comment -%} Brand statement {%- endcomment -%}
+  {%- comment -%} Brand statement — big, bold hero {%- endcomment -%}
   {% if section.settings.brand_statement != blank %}
-    <div class="px-6 pt-12 pb-4 text-center">
-      <p class="site-footer__brand text-lg md:text-xl font-semibold">
+    <div class="site-footer__brand-wrap">
+      <p class="site-footer__brand">
         {{ section.settings.brand_statement }}
       </p>
     </div>
   {% endif %}
 
-  {%- comment -%} Newsletter {%- endcomment -%}
+  {%- comment -%} Newsletter — dramatic feature block {%- endcomment -%}
   {% if section.settings.show_newsletter %}
     <div
-      class="site-footer__newsletter px-6 py-8{% if section.settings.brand_statement == blank %} pt-12{% endif %}"
+      class="site-footer__newsletter"
       x-data="{ newsletterSuccess: false }"
     >
-      <div class="max-w-md mx-auto text-center">
-        <h3 class="text-sm font-semibold tracking-wider uppercase mb-4">
-          {{ section.settings.newsletter_heading }}
-        </h3>
+      <h2 class="site-footer__newsletter-heading">
+        {{ section.settings.newsletter_heading }}
+      </h2>
 
-        {% form 'customer' %}
-          <input type="hidden" name="contact[tags]" value="newsletter">
+      {% form 'customer' %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
 
-          {%- if form.posted_successfully? -%}
-            <div x-init="newsletterSuccess = true"></div>
+        {%- if form.posted_successfully? -%}
+          <div x-init="newsletterSuccess = true"></div>
+        {%- endif -%}
+
+        <div x-show="!newsletterSuccess" class="site-footer__newsletter-form">
+          {%- if form.errors -%}
+            <div class="site-footer__form-errors" role="alert">
+              {{ form.errors | default_errors }}
+            </div>
           {%- endif -%}
 
-          <div x-show="!newsletterSuccess">
-            {%- if form.errors -%}
-              <div class="text-sm mb-4 text-center" role="alert">
-                {{ form.errors | default_errors }}
-              </div>
-            {%- endif -%}
-            <div class="flex flex-col sm:flex-row gap-3">
-              <input
-                type="email"
-                name="contact[email]"
-                class="site-footer__input flex-1 px-4 py-3 text-sm border rounded-none bg-transparent"
-                placeholder="{{ 'general.newsletter_form.newsletter_email' | t }}"
-                aria-label="{{ 'general.newsletter_form.newsletter_email' | t }}"
-                required
-              >
-              <button
-                type="submit"
-                class="site-footer__btn px-8 py-3 text-sm font-semibold uppercase tracking-wider border rounded-none transition-colors duration-200"
-              >
-                {{ 'general.newsletter_form.submit' | t }}
-              </button>
-            </div>
+          <div class="site-footer__newsletter-row">
+            <input
+              type="email"
+              name="contact[email]"
+              class="site-footer__input"
+              placeholder="{{ 'general.newsletter_form.newsletter_email' | t }}"
+              aria-label="{{ 'general.newsletter_form.newsletter_email' | t }}"
+              required
+            >
+            <button type="submit" class="site-footer__btn">
+              <span>{{ 'general.newsletter_form.submit' | t }}</span>
+              <svg class="site-footer__btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
           </div>
+        </div>
 
-          <div x-show="newsletterSuccess" x-cloak class="py-4">
-            <p class="text-sm opacity-80">
-              {{ section.settings.newsletter_success_message }}
-            </p>
-          </div>
-        {% endform %}
-      </div>
+        <div x-show="newsletterSuccess" x-cloak class="site-footer__newsletter-success">
+          <p>{{ section.settings.newsletter_success_message }}</p>
+        </div>
+      {% endform %}
     </div>
   {% endif %}
 
-  {%- comment -%} Divider {%- endcomment -%}
-  <div class="site-footer__divider mx-6"></div>
-
   {%- comment -%} Blocks — footer-column entries + any @theme blocks {%- endcomment -%}
-  <div class="px-6 py-10">
+  <div class="site-footer__blocks-wrap">
     <div class="site-footer__blocks">
       {% content_for 'blocks' %}
     </div>
   </div>
 
-  {%- comment -%} Social media links {%- endcomment -%}
+  {%- comment -%} Social media links — prominent with circular backgrounds {%- endcomment -%}
   {% if section.settings.show_social_links and has_social %}
-    <div class="site-footer__divider mx-6"></div>
-    <div class="px-6 py-8">
-      <h3 class="text-sm font-semibold tracking-wider uppercase mb-6 text-center">
-        {{ section.settings.social_heading }}
-      </h3>
-      <div class="flex justify-center gap-5 flex-wrap">
+    <div class="site-footer__social-wrap">
+      <h3 class="site-footer__social-heading">{{ section.settings.social_heading }}</h3>
+
+      <div class="site-footer__social-icons">
         {% if section.settings.social_instagram != blank %}
-          <a
-            href="{{ section.settings.social_instagram }}"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="site-footer__social-icon transition-transform duration-200 hover:scale-110"
-            aria-label="Instagram"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-            </svg>
+          <a href="{{ section.settings.social_instagram }}" target="_blank" rel="noopener noreferrer" class="site-footer__social-link" aria-label="Instagram">
+            <span class="site-footer__social-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+            </span>
           </a>
         {% endif %}
         {% if section.settings.social_pinterest != blank %}
-          <a
-            href="{{ section.settings.social_pinterest }}"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="site-footer__social-icon transition-transform duration-200 hover:scale-110"
-            aria-label="Pinterest"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2C6.477 2 2 6.477 2 12c0 4.237 2.636 7.855 6.356 9.312-.088-.791-.167-2.005.035-2.868.182-.78 1.172-4.971 1.172-4.971s-.299-.599-.299-1.484c0-1.391.806-2.428 1.809-2.428.853 0 1.265.64 1.265 1.408 0 .858-.546 2.141-.828 3.329-.236.996.499 1.807 1.481 1.807 1.777 0 3.143-1.874 3.143-4.579 0-2.394-1.72-4.068-4.177-4.068-2.845 0-4.515 2.134-4.515 4.34 0 .859.331 1.781.744 2.282a.3.3 0 01.069.287c-.076.316-.245.996-.278 1.135-.044.183-.145.222-.334.133-1.249-.582-2.03-2.408-2.03-3.874 0-3.154 2.292-6.052 6.608-6.052 3.469 0 6.165 2.472 6.165 5.776 0 3.447-2.173 6.22-5.189 6.22-1.013 0-1.966-.527-2.292-1.148 0 0-.501 1.909-.623 2.378-.226.868-.835 1.956-1.243 2.621.935.289 1.926.445 2.958.445 5.523 0 10-4.477 10-10S17.523 2 12 2z"/>
-</svg>
+          <a href="{{ section.settings.social_pinterest }}" target="_blank" rel="noopener noreferrer" class="site-footer__social-link" aria-label="Pinterest">
+            <span class="site-footer__social-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.237 2.636 7.855 6.356 9.312-.088-.791-.167-2.005.035-2.868.182-.78 1.172-4.971 1.172-4.971s-.299-.599-.299-1.484c0-1.391.806-2.428 1.809-2.428.853 0 1.265.64 1.265 1.408 0 .858-.546 2.141-.828 3.329-.236.996.499 1.807 1.481 1.807 1.777 0 3.143-1.874 3.143-4.579 0-2.394-1.72-4.068-4.177-4.068-2.845 0-4.515 2.134-4.515 4.34 0 .859.331 1.781.744 2.282a.3.3 0 01.069.287c-.076.316-.245.996-.278 1.135-.044.183-.145.222-.334.133-1.249-.582-2.03-2.408-2.03-3.874 0-3.154 2.292-6.052 6.608-6.052 3.469 0 6.165 2.472 6.165 5.776 0 3.447-2.173 6.22-5.189 6.22-1.013 0-1.966-.527-2.292-1.148 0 0-.501 1.909-.623 2.378-.226.868-.835 1.956-1.243 2.621.935.289 1.926.445 2.958.445 5.523 0 10-4.477 10-10S17.523 2 12 2z"/>
+              </svg>
+            </span>
           </a>
         {% endif %}
         {% if section.settings.social_facebook != blank %}
-          <a
-            href="{{ section.settings.social_facebook }}"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="site-footer__social-icon transition-transform duration-200 hover:scale-110"
-            aria-label="Facebook"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-            </svg>
+          <a href="{{ section.settings.social_facebook }}" target="_blank" rel="noopener noreferrer" class="site-footer__social-link" aria-label="Facebook">
+            <span class="site-footer__social-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+              </svg>
+            </span>
           </a>
         {% endif %}
         {% if section.settings.social_tiktok != blank %}
-          <a
-            href="{{ section.settings.social_tiktok }}"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="site-footer__social-icon transition-transform duration-200 hover:scale-110"
-            aria-label="TikTok"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
-            </svg>
+          <a href="{{ section.settings.social_tiktok }}" target="_blank" rel="noopener noreferrer" class="site-footer__social-link" aria-label="TikTok">
+            <span class="site-footer__social-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
+              </svg>
+            </span>
           </a>
         {% endif %}
         {% if section.settings.social_youtube != blank %}
-          <a
-            href="{{ section.settings.social_youtube }}"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="site-footer__social-icon transition-transform duration-200 hover:scale-110"
-            aria-label="YouTube"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29.94 29.94 0 0 0 1 12a29.94 29.94 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 2C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29.94 29.94 0 0 0 23 12a29.94 29.94 0 0 0-.46-5.58z"></path>
-              <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"></polygon>
-            </svg>
+          <a href="{{ section.settings.social_youtube }}" target="_blank" rel="noopener noreferrer" class="site-footer__social-link" aria-label="YouTube">
+            <span class="site-footer__social-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29.94 29.94 0 0 0 1 12a29.94 29.94 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 2C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29.94 29.94 0 0 0 23 12a29.94 29.94 0 0 0-.46-5.58z"></path>
+                <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"></polygon>
+              </svg>
+            </span>
           </a>
         {% endif %}
       </div>
     </div>
   {% endif %}
 
-  {%- comment -%} Bottom bar — copyright, legal, payment icons {%- endcomment -%}
-  <div class="site-footer__divider mx-6"></div>
-  <div class="px-6 py-6">
-    <div class="site-footer__bottom flex flex-col md:flex-row items-center justify-between gap-4 text-xs opacity-60">
-      <div class="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-center md:text-left">
+  {%- comment -%} Bottom bar — elevated from main content {%- endcomment -%}
+  <div class="site-footer__bottom-wrap">
+    <div class="site-footer__bottom">
+      <div class="site-footer__bottom-left">
         <span>
           {%- if section.settings.copyright_text != blank -%}
             {{ section.settings.copyright_text }}
@@ -189,21 +160,16 @@
         </span>
 
         {% if section.settings.legal_menu != blank %}
-          <div class="flex items-center gap-2 md:gap-4">
+          <nav class="site-footer__legal">
             {% for link in section.settings.legal_menu.links %}
-              <a
-                href="{{ link.url }}"
-                class="hover:opacity-100 transition-opacity duration-200 no-underline"
-              >
-                {{ link.title }}
-              </a>
+              <a href="{{ link.url }}">{{ link.title }}</a>
             {% endfor %}
-          </div>
+          </nav>
         {% endif %}
       </div>
 
       {% if section.settings.show_payment_icons %}
-        <div class="site-footer__payment flex flex-wrap justify-center gap-2">
+        <div class="site-footer__payment">
           {% for type in shop.enabled_payment_types %}
             {{ type | payment_type_svg_tag }}
           {% endfor %}
@@ -214,52 +180,159 @@
 </footer>
 
 {% stylesheet %}
+  /* ===== Base ===== */
   .site-footer {
     background-color: var(--footer-bg);
     color: var(--footer-text);
     font-family: var(--font-primary--family, inherit);
+    overflow: hidden;
+  }
+
+  /* ===== Brand ===== */
+  .site-footer__brand-wrap {
+    padding: 5rem 1.5rem 4rem;
+  }
+
+  @media (min-width: 768px) {
+    .site-footer__brand-wrap {
+      padding: 7rem 1.5rem 5rem;
+    }
   }
 
   .site-footer__brand {
-    color: var(--footer-text);
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    max-width: 24ch;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    .site-footer__brand {
+      font-size: 3.75rem;
+      line-height: 1.05;
+    }
+  }
+
+  /* ===== Newsletter ===== */
+  .site-footer__newsletter {
+    padding: 0 1.5rem 4rem;
+    max-width: 42rem;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    .site-footer__newsletter {
+      padding-bottom: 5rem;
+    }
+  }
+
+  .site-footer__newsletter-heading {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0.7;
+  }
+
+  .site-footer__newsletter-form {
+    /* wrapper for the form inputs */
+  }
+
+  .site-footer__form-errors {
+    font-size: 0.8125rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+  }
+
+  .site-footer__newsletter-row {
+    display: flex;
+    gap: 0;
+    border: 2px solid color-mix(in srgb, var(--footer-text) 25%, transparent);
+    border-radius: 9999px;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+  }
+
+  .site-footer__newsletter-row:focus-within {
+    border-color: var(--footer-accent);
   }
 
   .site-footer__input {
-    border-color: var(--footer-text);
-    color: var(--footer-text);
-    opacity: 0.6;
-    border-width: 1px;
+    flex: 1;
+    background: transparent;
+    border: none;
     outline: none;
+    color: var(--footer-text);
+    font-size: 1rem;
+    padding: 1rem 1.5rem;
+    min-width: 0;
   }
 
   .site-footer__input::placeholder {
     color: var(--footer-text);
-    opacity: 0.4;
-  }
-
-  .site-footer__input:focus {
-    opacity: 0.9;
-    border-color: var(--footer-accent);
+    opacity: 0.35;
   }
 
   .site-footer__btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     background-color: var(--footer-accent);
     color: var(--footer-bg);
-    border-color: var(--footer-accent);
+    border: none;
+    padding: 1rem 1.75rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.25s ease, gap 0.25s ease;
   }
 
   .site-footer__btn:hover {
-    background-color: color-mix(in srgb, var(--footer-accent) 85%, transparent);
-    border-color: color-mix(in srgb, var(--footer-accent) 85%, transparent);
+    background-color: color-mix(in srgb, var(--footer-accent) 80%, white);
+    gap: 0.75rem;
   }
 
-  .site-footer__divider {
-    height: 1px;
-    background: color-mix(in srgb, var(--footer-text) 10%, transparent);
+  .site-footer__btn-arrow {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+  }
+
+  .site-footer__btn:hover .site-footer__btn-arrow {
+    transform: translateX(3px);
+  }
+
+  .site-footer__newsletter-success {
+    padding: 3rem 0;
+    font-size: 1.125rem;
+    font-weight: 500;
+  }
+
+  /* ===== Blocks / Columns ===== */
+  .site-footer__blocks-wrap {
+    padding: 4rem 1.5rem;
+    border-top: 1px solid color-mix(in srgb, var(--footer-text) 8%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--footer-text) 8%, transparent);
+  }
+
+  @media (min-width: 768px) {
+    .site-footer__blocks-wrap {
+      padding: 5rem 1.5rem;
+    }
   }
 
   .site-footer__blocks {
+    max-width: 72rem;
+    margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -268,24 +341,130 @@
   @media (min-width: 768px) {
     .site-footer__blocks {
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 3rem;
     }
   }
 
-  .site-footer__social-icon {
-    color: var(--footer-text);
-    opacity: 0.6;
+  /* ===== Social ===== */
+  .site-footer__social-wrap {
+    padding: 3rem 1.5rem 4rem;
+    text-align: center;
   }
 
-  .site-footer__social-icon:hover {
+  @media (min-width: 768px) {
+    .site-footer__social-wrap {
+      padding: 4rem 1.5rem 5rem;
+    }
+  }
+
+  .site-footer__social-heading {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    opacity: 0.7;
+  }
+
+  .site-footer__social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .site-footer__social-link {
+    text-decoration: none;
+  }
+
+  .site-footer__social-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid color-mix(in srgb, var(--footer-text) 20%, transparent);
+    color: var(--footer-text);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+  }
+
+  .site-footer__social-circle:hover {
+    border-color: var(--footer-accent);
+    background-color: var(--footer-accent);
+    color: var(--footer-bg);
     opacity: 1;
-    color: var(--footer-accent);
+    transform: translateY(-3px);
+  }
+
+  /* ===== Bottom Bar ===== */
+  .site-footer__bottom-wrap {
+    background-color: color-mix(in srgb, var(--footer-text) 4%, var(--footer-bg));
+    border-top: 1px solid color-mix(in srgb, var(--footer-text) 8%, transparent);
+    padding: 1.5rem 1.5rem;
+  }
+
+  .site-footer__bottom {
+    max-width: 72rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.8125rem;
+    opacity: 0.55;
+  }
+
+  @media (min-width: 768px) {
+    .site-footer__bottom {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+
+  .site-footer__bottom-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .site-footer__bottom-left {
+      flex-direction: row;
+      gap: 1.5rem;
+    }
+  }
+
+  .site-footer__legal {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .site-footer__legal a {
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s ease;
+  }
+
+  .site-footer__legal a:hover {
+    opacity: 1;
+  }
+
+  .site-footer__payment {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
   }
 
   .site-footer__payment svg {
-    height: 24px;
+    height: 22px;
     width: auto;
   }
 
+  /* ===== Global link styles ===== */
   .site-footer a,
   .site-footer a:visited,
   .site-footer a:active {

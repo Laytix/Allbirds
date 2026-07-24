@@ -11,25 +11,23 @@
   {{ block.shopify_attributes }}
 >
   <button
-    class="footer-column__toggle flex md:hidden w-full items-center justify-between py-3 text-left"
+    class="footer-column__toggle"
     @click="open = !open"
     :aria-expanded="open"
   >
-    <span class="text-sm font-semibold tracking-wider uppercase">
-      {{ block.settings.heading }}
-    </span>
+    <span>{{ block.settings.heading }}</span>
     <span
       x-text="open ? '\u2212' : '+'"
-      class="text-xl font-light transition-transform duration-200"
+      class="footer-column__toggle-icon"
     ></span>
   </button>
 
-  <h3 class="hidden md:block text-sm font-semibold tracking-wider uppercase mb-4">
+  <h3 class="footer-column__heading">
     {{ block.settings.heading }}
   </h3>
 
   <ul
-    class="footer-column__links space-y-2"
+    class="footer-column__links"
     x-show="open"
     x-transition:enter="transition ease-out duration-200"
     x-transition:enter-start="opacity-0 -translate-y-1"
@@ -40,11 +38,8 @@
     x-cloak
   >
     {% for link in block.settings.menu.links %}
-      <li>
-        <a
-          href="{{ link.url }}"
-          class="text-sm opacity-70 hover:opacity-100 transition-opacity duration-200 no-underline inline-block"
-        >
+      <li class="footer-column__link-item">
+        <a href="{{ link.url }}" class="footer-column__link">
           {{ link.title }}
         </a>
       </li>
@@ -57,27 +52,87 @@
     font-family: var(--font-primary--family, inherit);
   }
 
+  /* ===== Mobile toggle ===== */
   .footer-column__toggle {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 0;
     background: none;
     border: none;
-    cursor: pointer;
     border-bottom: 1px solid;
-    border-color: color-mix(in srgb, currentColor 10%, transparent);
+    border-color: color-mix(in srgb, currentColor 12%, transparent);
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: inherit;
+    font-family: inherit;
   }
 
+  .footer-column__toggle-icon {
+    font-size: 1.25rem;
+    font-weight: 300;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+  }
+
+  .footer-column__toggle:hover .footer-column__toggle-icon {
+    opacity: 1;
+  }
+
+  /* ===== Desktop heading ===== */
+  .footer-column__heading {
+    display: none;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 0 0 1.25rem 0;
+    opacity: 0.9;
+  }
+
+  /* ===== Links ===== */
   .footer-column__links {
     list-style: none;
-    padding: 0 0 1rem 0;
+    padding: 0 0 1.25rem 0;
     margin: 0;
   }
 
-  /* Always show links on desktop regardless of Alpine x-show state */
+  .footer-column__link-item {
+    /* spacing handled by link padding */
+  }
+
+  .footer-column__link {
+    display: inline-block;
+    padding: 0.25rem 0;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    color: inherit;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .footer-column__link:hover {
+    opacity: 1;
+    transform: translateX(3px);
+  }
+
+  /* ===== Desktop overrides ===== */
   @media (min-width: 768px) {
-    .footer-column__links {
-      display: block !important;
-    }
     .footer-column__toggle {
       display: none !important;
+    }
+
+    .footer-column__heading {
+      display: block;
+    }
+
+    .footer-column__links {
+      display: block !important;
+      padding-bottom: 0;
     }
   }
 {% endstylesheet %}
