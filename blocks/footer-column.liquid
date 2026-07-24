@@ -1,0 +1,108 @@
+{%- comment -%}
+  Block: footer-column
+  Description: Navigation column for the footer with heading and links.
+  On mobile (< 768px), collapses into an accordion toggle. On desktop,
+  links are always visible.
+{%- endcomment -%}
+
+<div
+  class="footer-column"
+  x-data="{ open: false }"
+  {{ block.shopify_attributes }}
+>
+  <button
+    class="footer-column__toggle flex md:hidden w-full items-center justify-between py-3 text-left"
+    @click="open = !open"
+    :aria-expanded="open"
+  >
+    <span class="text-sm font-semibold tracking-wider uppercase">
+      {{ block.settings.heading }}
+    </span>
+    <span
+      x-text="open ? '\u2212' : '+'"
+      class="text-xl font-light transition-transform duration-200"
+    ></span>
+  </button>
+
+  <h3 class="hidden md:block text-sm font-semibold tracking-wider uppercase mb-4">
+    {{ block.settings.heading }}
+  </h3>
+
+  <ul
+    class="footer-column__links space-y-2"
+    x-show="open"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0 -translate-y-1"
+    x-transition:enter-end="opacity-100 translate-y-0"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100 translate-y-0"
+    x-transition:leave-end="opacity-0 -translate-y-1"
+    x-cloak
+  >
+    {% for link in block.settings.menu.links %}
+      <li>
+        <a
+          href="{{ link.url }}"
+          class="text-sm opacity-70 hover:opacity-100 transition-opacity duration-200 no-underline inline-block"
+        >
+          {{ link.title }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% stylesheet %}
+  .footer-column {
+    font-family: var(--font-primary--family, inherit);
+  }
+
+  .footer-column__toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-bottom: 1px solid;
+    border-color: color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .footer-column__links {
+    list-style: none;
+    padding: 0 0 1rem 0;
+    margin: 0;
+  }
+
+  /* Always show links on desktop regardless of Alpine x-show state */
+  @media (min-width: 768px) {
+    .footer-column__links {
+      display: block !important;
+    }
+    .footer-column__toggle {
+      display: none !important;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Footer Column",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Column heading",
+      "default": "Column"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Column menu"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer Column",
+      "category": "Footer"
+    }
+  ]
+}
+{% endschema %}
