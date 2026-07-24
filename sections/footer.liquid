@@ -4,17 +4,21 @@
   navigation columns (via theme blocks), social media icons, and bottom bar.
 {%- endcomment -%}
 
-{%- liquid
-  assign bg = section.settings.background_color
-  assign text = section.settings.text_color
-  assign accent = section.settings.accent_color
-  assign has_social =
-    section.settings.social_instagram != blank
-    or section.settings.social_pinterest != blank
-    or section.settings.social_facebook != blank
-    or section.settings.social_tiktok != blank
-    or section.settings.social_youtube != blank
--%}
+{%- assign bg = section.settings.background_color -%}
+{%- assign text = section.settings.text_color -%}
+{%- assign accent = section.settings.accent_color -%}
+{%- assign has_social = false -%}
+{%- if section.settings.social_instagram != blank -%}
+  {%- assign has_social = true -%}
+{%- elsif section.settings.social_pinterest != blank -%}
+  {%- assign has_social = true -%}
+{%- elsif section.settings.social_facebook != blank -%}
+  {%- assign has_social = true -%}
+{%- elsif section.settings.social_tiktok != blank -%}
+  {%- assign has_social = true -%}
+{%- elsif section.settings.social_youtube != blank -%}
+  {%- assign has_social = true -%}
+{%- endif -%}
 
 <footer
   class="site-footer w-full"

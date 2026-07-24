@@ -22,31 +22,7 @@
         "copyright_text": "",
         "legal_menu": "",
         "show_payment_icons": true
-      },
-      "blocks": {
-        "block-1": {
-          "type": "footer-column",
-          "settings": {
-            "heading": "Help",
-            "menu": ""
-          }
-        },
-        "block-2": {
-          "type": "footer-column",
-          "settings": {
-            "heading": "Shop",
-            "menu": ""
-          }
-        },
-        "block-3": {
-          "type": "footer-column",
-          "settings": {
-            "heading": "Company",
-            "menu": ""
-          }
-        }
-      },
-      "block_order": ["block-1", "block-2", "block-3"]
+      }
     }
   },
   "order": ["footer"]
