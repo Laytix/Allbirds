@@ -1,0 +1,69 @@
+{% comment %}
+  Snippet: cart-pop
+  Mini bag popover — appears after AJAX add-to-cart, anchored under the navbar.
+  Driven by $store.ui.cartPopOpen and $store.cart.lastAdded.
+  Styles: assets/custom.css (.cart-pop)
+{%- endcomment -%}
+
+<div
+  class="cart-pop"
+  x-data="{ timer: null }"
+  x-show="$store.ui.cartPopOpen"
+  x-cloak
+  x-transition:enter="transition ease-out duration-300"
+  x-transition:enter-start="opacity-0 -translate-y-2 scale-95"
+  x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+  x-transition:leave="transition ease-in duration-150"
+  x-transition:leave-start="opacity-100"
+  x-transition:leave-end="opacity-0 -translate-y-1"
+  @click.outside="$store.ui.cartPopOpen && $store.ui.closeAll()"
+  @keydown.escape.window="$store.ui.cartPopOpen && $store.ui.closeAll()"
+  x-init="$watch('$store.ui.cartPopOpen', (open) => { clearTimeout(timer); if (open) timer = setTimeout(() => $store.ui.closeAll(), 5000) })"
+  role="status"
+  aria-live="polite"
+>
+  <div class="cart-pop__header">
+    <span class="cart-pop__check" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path class="cart-pop__check-path" d="M20 6L9 17l-5-5"/>
+      </svg>
+    </span>
+    <span class="cart-pop__title">Added to Bag</span>
+    <button type="button" class="cart-pop__close" @click="$store.ui.closeAll()" aria-label="Close">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <template x-if="$store.cart.lastAdded">
+    <div class="cart-pop__item-row">
+      <div class="cart-pop__thumb">
+        <img
+          :src="$store.cart.lastAdded.image"
+          :alt="$store.cart.lastAdded.title"
+          x-show="$store.cart.lastAdded.image"
+        >
+      </div>
+      <div class="cart-pop__item-info">
+        <p class="cart-pop__item-title" x-text="$store.cart.lastAdded.title"></p>
+        <p
+          class="cart-pop__item-variant"
+          x-text="[$store.cart.lastAdded.variantTitle, $store.cart.lastAdded.quantity > 1 ? 'Qty ' + $store.cart.lastAdded.quantity : ''].filter(Boolean).join(' · ')"
+        ></p>
+      </div>
+      <p class="cart-pop__item-price" x-text="$store.cart.lastAdded.price"></p>
+    </div>
+  </template>
+
+  <div class="cart-pop__subtotal">
+    <span x-text="'Subtotal (' + $store.cart.count + ($store.cart.count === 1 ? ' item)' : ' items)')"></span>
+    <span class="cart-pop__subtotal-price" x-text="$store.cart.formatMoney($store.cart.total)"></span>
+  </div>
+
+  <div class="cart-pop__actions">
+    <a href="/checkout" class="cart-pop__checkout">Checkout</a>
+    <a href="{{ routes.cart_url }}" class="cart-pop__view-cart" @click="$store.ui.closeAll()">View Cart</a>
+  </div>
+</div>

@@ -23,7 +23,10 @@
     {% # Social, title, etc. %}
     {% render 'meta-tags' %}
 
-     {%- comment -%} Preconnect to CDNs for faster loading {%- endcomment -%}
+     {%- comment -%} Wordmark font (header brand) {%- endcomment -%}
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600&display=swap" rel="stylesheet">
+
+    {%- comment -%} Preconnect to CDNs for faster loading {%- endcomment -%}
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
@@ -33,14 +36,17 @@
     {%- comment -%} 1. Tailwind CSS (compiled output from CLI build) {%- endcomment -%}
     {{ 'application.css' | asset_url | stylesheet_tag }}
 
+    {%- comment -%} 1b. Shared custom component styles (product card) {%- endcomment -%}
+    {{ 'custom.css' | asset_url | stylesheet_tag }}
+
     {%- comment -%} 2. Flowbite CSS (CDN — component styles) {%- endcomment -%}
     <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css" rel="stylesheet">
 
-    {%- comment -%} 3. Alpine.js (CDN — defer so it runs after DOM parse) {%- endcomment -%}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
-
-    {%- comment -%} 4. Alpine.js global stores (must load before Alpine starts) {%- endcomment -%}
+    {%- comment -%} 3. Alpine.js global stores (must load before Alpine starts) {%- endcomment -%}
     <script src="{{ 'alpine-stores.js' | asset_url }}" defer></script>
+
+    {%- comment -%} 4. Alpine.js (CDN — defer so it runs after DOM parse) {%- endcomment -%}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
 
 
     {{ content_for_header }}
@@ -49,10 +55,20 @@
   <body>
     {% sections 'header-group' %}
 
+    {% render 'cart-drawer' %}
+
+    {% render 'cart-pop' %}
+
     {% render 'size-guide-modal' %}
 
     {{ content_for_layout }}
 
     {% sections 'footer-group' %}
+
+    {%- comment -%} Custom theme JS — ProductSlider custom element, cart store init {%- endcomment -%}
+    <script src="{{ 'theme.js' | asset_url }}" defer></script>
+
+    {%- comment -%} Flowbite JS — powers data-accordion behaviors (footer columns) {%- endcomment -%}
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
   </body>
 </html>

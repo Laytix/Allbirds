@@ -1,0 +1,97 @@
+{% comment %}
+  Snippet: cart-drawer
+  Slide-out bag — opened by the navbar cart icon. Driven by
+  $store.ui.cartDrawerOpen / $store.cart. Styles: assets/custom.css (.cart-drawer)
+{%- endcomment -%}
+
+<div
+  class="cart-drawer"
+  x-data
+  x-show="$store.ui.cartDrawerOpen"
+  x-cloak
+  x-transition:enter="transition ease-out duration-200"
+  x-transition:enter-start="opacity-0"
+  x-transition:enter-end="opacity-100"
+  x-transition:leave="transition ease-in duration-150"
+  x-transition:leave-start="opacity-100"
+  x-transition:leave-end="opacity-0"
+  @click.self="$store.ui.closeAll()"
+  @keydown.escape.window="$store.ui.cartDrawerOpen && $store.ui.closeAll()"
+>
+  <div
+    class="cart-drawer__panel"
+    x-show="$store.ui.cartDrawerOpen"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="translate-x-full"
+    x-transition:enter-end="translate-x-0"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="translate-x-0"
+    x-transition:leave-end="translate-x-full"
+    @click.stop
+    role="dialog"
+    aria-modal="true"
+    aria-label="{{ 'cart.general.title' | t }}"
+  >
+    <div class="cart-drawer__header">
+      <h2 class="cart-drawer__title">{{ 'cart.general.title' | t }}</h2>
+      <button type="button" class="cart-drawer__close" @click="$store.ui.closeAll()" aria-label="{{ 'cart.general.close' | t }}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="cart-drawer__items">
+      <template x-if="$store.cart.count === 0">
+        <p class="cart-drawer__empty">{{ 'cart.general.empty' | t }}</p>
+      </template>
+
+      <template x-for="item in $store.cart.items" :key="item.key">
+        <div class="cart-drawer__item">
+          <div class="cart-drawer__thumb">
+            <img :src="item.image" :alt="item.title">
+          </div>
+          <div class="cart-drawer__item-info">
+            <p class="cart-drawer__item-title" x-text="item.product_title"></p>
+            <p class="cart-drawer__item-variant" x-text="item.variant_title" x-show="item.variant_title"></p>
+            <div class="cart-drawer__qty">
+              <button
+                type="button"
+                @click="$store.cart.update(item.key, item.quantity - 1)"
+                aria-label="Decrease quantity"
+              >&minus;</button>
+              <span x-text="item.quantity"></span>
+              <button
+                type="button"
+                @click="$store.cart.update(item.key, item.quantity + 1)"
+                aria-label="Increase quantity"
+              >+</button>
+            </div>
+          </div>
+          <div class="cart-drawer__item-side">
+            <p class="cart-drawer__item-price" x-text="$store.cart.formatMoney(item.line_price)"></p>
+            <button type="button" class="cart-drawer__remove" @click="$store.cart.remove(item.key)">
+              {{ 'cart.general.remove' | t }}
+            </button>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <div class="cart-drawer__footer" x-show="$store.cart.count > 0">
+      <div class="cart-drawer__subtotal">
+        <span>{{ 'cart.general.subtotal' | t }}</span>
+        <span class="cart-drawer__subtotal-price" x-text="$store.cart.formatMoney($store.cart.total)"></span>
+      </div>
+      <form action="{{ routes.cart_url }}" method="post">
+        <button type="submit" name="checkout" class="cart-drawer__checkout">
+          {{ 'cart.general.checkout' | t }}
+        </button>
+      </form>
+      <a href="{{ routes.cart_url }}" class="cart-drawer__view-cart" @click="$store.ui.closeAll()">
+        {{ 'cart.general.view_cart' | t }}
+      </a>
+    </div>
+  </div>
+</div>

@@ -26,7 +26,16 @@
     "checkout": "Checkout",
     "title": "Cart",
     "update": "Update",
-    "remove": "Remove"
+    "remove": "Remove",
+    "general": {
+      "title": "Bag",
+      "close": "Close",
+      "empty": "Your bag is empty",
+      "remove": "Remove",
+      "subtotal": "Subtotal",
+      "view_cart": "View Cart",
+      "checkout": "Checkout"
+    }
   },
   "customers": {
     "login": {
@@ -34,6 +43,12 @@
       "password": "Password",
       "submit": "Sign in",
       "title": "Login"
+    }
+  },
+  "general": {
+    "header": {
+      "menu": "Menu",
+      "close": "Close"
     }
   },
   "collections": {
