@@ -111,6 +111,13 @@ document.addEventListener('alpine:init', () => {
       root.querySelectorAll('input[type="radio"]:checked').forEach((input) => {
         this.options[input.name] = input.value;
       });
+      const form = this.$el.querySelector('form[action*="/cart/add"]');
+      if (form) {
+        form.addEventListener('submit', (event) => {
+          event.preventDefault();
+          this.addToCart(event);
+        });
+      }
       this.resolve();
     },
 

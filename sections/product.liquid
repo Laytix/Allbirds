@@ -61,7 +61,7 @@
       </div>
     {%- endif -%}
 
-    <form method="post" action="{{ routes.cart_add_url }}" @submit.prevent="addToCart($event)">
+    {% form 'product', product, class: 'product-info__form', novalidate: 'novalidate' %}
       <input type="hidden" name="quantity" value="1">
 
       {%- comment -%} Hidden real select keeps the form working without JS {%- endcomment -%}
@@ -186,7 +186,7 @@
       ></button>
 
       {{ form | payment_button }}
-    </form>
+    {% endform %}
 
     {%- if section.settings.shipping_note != blank -%}
       <p class="product-info__note">{{ section.settings.shipping_note | escape }}</p>
@@ -356,6 +356,12 @@
   }
 
   .product-info form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .product-info__form {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
