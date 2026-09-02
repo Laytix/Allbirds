@@ -1,0 +1,129 @@
+{% comment %}
+  Snippet: size-guide-modal
+  Centered modal — opened from the product page size guide trigger. Driven by
+  $store.ui.sizeGuideOpen. Styles: assets/custom.css (.size-guide-modal)
+{%- endcomment -%}
+
+<div
+  class="size-guide-modal"
+  x-data="{ gender: 'men' }"
+  x-show="$store.ui.sizeGuideOpen"
+  x-cloak
+  x-transition:enter="transition ease-out duration-200"
+  x-transition:enter-start="opacity-0"
+  x-transition:enter-end="opacity-100"
+  x-transition:leave="transition ease-in duration-150"
+  x-transition:leave-start="opacity-100"
+  x-transition:leave-end="opacity-0"
+  @click.self="$store.ui.closeAll()"
+  @keydown.escape.window="$store.ui.sizeGuideOpen && $store.ui.closeAll()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="size-guide-title"
+>
+  <div
+    class="size-guide-modal__dialog"
+    x-show="$store.ui.sizeGuideOpen"
+    x-transition:enter="transition ease-out duration-250"
+    x-transition:enter-start="opacity-0 scale-95"
+    x-transition:enter-end="opacity-100 scale-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100 scale-100"
+    x-transition:leave-end="opacity-0 scale-95"
+    @click.stop
+  >
+    <div class="size-guide-modal__header">
+      <div>
+        <h2 id="size-guide-title" class="size-guide-modal__title">Size &amp; Fit Guide</h2>
+        <p class="size-guide-modal__subtitle">Find your ideal fit with our shoe sizing chart</p>
+      </div>
+      <button type="button" class="size-guide-modal__close" @click="$store.ui.closeAll()" aria-label="Close size guide">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="size-guide-modal__tip">
+      <span class="size-guide-modal__tip-icon" aria-hidden="true">💡</span>
+      <p><strong>Fit Tip:</strong> Our shoes run true to size. If you wear a half size or have a wider foot, we recommend sizing up to the next full size for optimal comfort.</p>
+    </div>
+
+    <div class="size-guide-modal__tabs" role="tablist" aria-label="Sizing chart selection">
+      <button
+        type="button"
+        class="size-guide-modal__tab"
+        role="tab"
+        :class="gender === 'men' && 'is-active'"
+        :aria-selected="gender === 'men'"
+        @click="gender = 'men'"
+      >Men's Sizing</button>
+      <button
+        type="button"
+        class="size-guide-modal__tab"
+        role="tab"
+        :class="gender === 'women' && 'is-active'"
+        :aria-selected="gender === 'women'"
+        @click="gender = 'women'"
+      >Women's Sizing</button>
+    </div>
+
+    <div class="size-guide-modal__table-scroller">
+      <table class="size-guide-modal__table" x-show="gender === 'men'">
+        <thead>
+          <tr>
+            <th>US Men</th>
+            <th>US Women</th>
+            <th>UK</th>
+            <th>EU</th>
+            <th>CM (Foot Length)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>8</td><td>9.5</td><td>7</td><td>41</td><td>26.0 cm</td></tr>
+          <tr><td>8.5</td><td>10</td><td>7.5</td><td>41.5</td><td>26.5 cm</td></tr>
+          <tr><td>9</td><td>10.5</td><td>8</td><td>42</td><td>27.0 cm</td></tr>
+          <tr><td>9.5</td><td>11</td><td>8.5</td><td>42.5</td><td>27.5 cm</td></tr>
+          <tr><td>10</td><td>11.5</td><td>9</td><td>43</td><td>28.0 cm</td></tr>
+          <tr><td>10.5</td><td>12</td><td>9.5</td><td>44</td><td>28.5 cm</td></tr>
+          <tr><td>11</td><td>12.5</td><td>10</td><td>44.5</td><td>29.0 cm</td></tr>
+          <tr><td>11.5</td><td>13</td><td>10.5</td><td>45</td><td>29.5 cm</td></tr>
+          <tr><td>12</td><td>13.5</td><td>11</td><td>45.5</td><td>30.0 cm</td></tr>
+          <tr><td>13</td><td>14.5</td><td>12</td><td>47</td><td>31.0 cm</td></tr>
+          <tr><td>14</td><td>15.5</td><td>13</td><td>48.5</td><td>32.0 cm</td></tr>
+        </tbody>
+      </table>
+
+      <table class="size-guide-modal__table" x-show="gender === 'women'" x-cloak>
+        <thead>
+          <tr>
+            <th>US Women</th>
+            <th>US Men</th>
+            <th>UK</th>
+            <th>EU</th>
+            <th>CM (Foot Length)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>5</td><td>3.5</td><td>3</td><td>35</td><td>22.0 cm</td></tr>
+          <tr><td>5.5</td><td>4</td><td>3.5</td><td>35.5</td><td>22.5 cm</td></tr>
+          <tr><td>6</td><td>4.5</td><td>4</td><td>36</td><td>23.0 cm</td></tr>
+          <tr><td>6.5</td><td>5</td><td>4.5</td><td>36.5</td><td>23.5 cm</td></tr>
+          <tr><td>7</td><td>5.5</td><td>5</td><td>37.5</td><td>24.0 cm</td></tr>
+          <tr><td>7.5</td><td>6</td><td>5.5</td><td>38</td><td>24.5 cm</td></tr>
+          <tr><td>8</td><td>6.5</td><td>6</td><td>38.5</td><td>25.0 cm</td></tr>
+          <tr><td>8.5</td><td>7</td><td>6.5</td><td>39</td><td>25.5 cm</td></tr>
+          <tr><td>9</td><td>7.5</td><td>7</td><td>40</td><td>26.0 cm</td></tr>
+          <tr><td>9.5</td><td>8</td><td>7.5</td><td>40.5</td><td>26.5 cm</td></tr>
+          <tr><td>10</td><td>8.5</td><td>8</td><td>41</td><td>27.0 cm</td></tr>
+          <tr><td>11</td><td>9.5</td><td>9</td><td>42.5</td><td>28.0 cm</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="size-guide-modal__footer">
+      <p class="size-guide-modal__footer-text">Still unsure? Try them risk-free for 30 days. If the fit isn't right, return or exchange for free.</p>
+    </div>
+  </div>
+</div>
