@@ -220,11 +220,13 @@
 
   .hero-slider__prog-item {
     flex: 1;
-    height: 3px;
+    /* 3px visual bar centered in a 23px hit area (padding + background-clip) */
+    height: 23px;
+    padding: 10px 0;
     border-radius: 2px;
     border: none;
-    padding: 0;
     background: rgba(255, 255, 255, 0.28);
+    background-clip: content-box;
     cursor: pointer;
     position: relative;
     overflow: hidden;
@@ -234,7 +236,9 @@
     display: block;
     position: absolute;
     inset: 0;
+    padding: 10px 0;
     background: #ffffff;
+    background-clip: content-box;
     border-radius: 2px;
     transform: scaleX(0);
     transform-origin: left center;
@@ -388,10 +392,10 @@
     background: rgba(255, 255, 255, 0.1);
   }
 
-  /* ── Mobile — 9:16 portrait ── */
+  /* ── Mobile — 4:5 portrait ── */
   @media (max-width: 640px) {
     .hero-slider {
-      aspect-ratio: 9 / 16;
+      aspect-ratio: 4 / 5;
       max-height: 100svh;
       border-radius: 0.75rem;
       margin: 0.75rem;
@@ -414,7 +418,7 @@
     }
 
     .hero-slider__overlay-inner {
-      padding: 1.5rem 1.25rem 3.5rem;
+      padding: 1.25rem 1.25rem 3rem;
       width: 100%;
     }
 
@@ -423,11 +427,8 @@
       padding: 0.6875rem 1rem;
     }
 
-    /* Move progress bars above the text panel on mobile */
-    .hero-slider__progress {
-      bottom: auto;
-      top: 1rem;
-    }
+    /* Progress bars stay at the bottom (desktop placement) — the overlay's
+       3rem bottom padding keeps the text panel clear of them */
   }
 
 {% endstylesheet %}

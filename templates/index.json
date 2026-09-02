@@ -44,10 +44,21 @@
         "col_4_a": "",
         "col_4_b": ""
       }
+    },
+    "product_slider_fC9HBw": {
+      "type": "product-slider",
+      "name": "Product Slider",
+      "settings": {
+        "collection": "best-sellers",
+        "heading": "Best Sellers",
+        "products_to_show": 8,
+        "card_background": "#FFFFFF"
+      }
     }
   },
   "order": [
     "hero_slider_Mfxd9H",
-    "featured_collections_khyqxF"
+    "featured_collections_khyqxF",
+    "product_slider_fC9HBw"
   ]
 }

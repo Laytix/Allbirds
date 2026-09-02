@@ -1,0 +1,69 @@
+{% comment %}
+  Snippet: product-card
+  Params:
+    product {Object} — the product to render
+  Shared by: sections/product-slider.liquid, sections/collection.liquid
+  Styles: assets/custom.css (.product-card)
+{%- endcomment -%}
+
+{%- comment -%} Color option: index, label value, native swatch {%- endcomment -%}
+{%- assign color_index = -1 -%}
+{%- assign color_value = blank -%}
+{%- assign swatch_color = blank -%}
+{%- assign swatch_image = blank -%}
+{%- for opt in product.options_with_values -%}
+  {%- assign opt_name = opt.name | downcase -%}
+  {%- if opt_name == 'color' or opt_name == 'colour' -%}
+    {%- assign color_index = forloop.index0 -%}
+    {%- assign opt_val = opt.values[0] -%}
+    {%- if opt_val -%}
+      {%- assign color_value = opt_val.name -%}
+      {%- if opt_val.swatch -%}
+        {%- assign swatch_color = opt_val.swatch.color -%}
+        {%- assign swatch_image = opt_val.swatch.image -%}
+      {%- endif -%}
+    {%- endif -%}
+    {%- break -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- if color_value == blank and color_index >= 0 -%}
+  {%- assign color_value = product.selected_or_first_available_variant.options[color_index] -%}
+{%- endif -%}
+
+<a href="{{ product.url }}" class="product-card">
+  <div class="product-card__media">
+    {%- if product.tags contains 'new' -%}
+      <span class="product-card__badge" aria-hidden="true">New</span>
+    {%- endif -%}
+
+    {%- if product.featured_image -%}
+      {{
+        product.featured_image
+        | image_url: width: 800
+        | image_tag:
+          loading: 'lazy',
+          widths: '400,600,800',
+          sizes: '(min-width: 1024px) 25vw, (min-width: 640px) 40vw, 80vw',
+          class: 'product-card__img'
+      }}
+    {%- endif -%}
+  </div>
+
+  <h3 class="product-card__title">{{ product.title | escape }}</h3>
+
+  {%- if color_value != blank -%}
+    <p class="product-card__colorway">{{ color_value }}</p>
+  {%- endif -%}
+
+  <div class="product-card__footer">
+    {%- if swatch_image -%}
+      <span class="product-card__swatch" style="background-image: url({{ swatch_image | image_url: width: 48 }});" aria-hidden="true"></span>
+    {%- elsif swatch_color != blank -%}
+      <span class="product-card__swatch" style="background-color: {{ swatch_color }};" aria-hidden="true"></span>
+    {%- elsif product.featured_image -%}
+      <span class="product-card__swatch" style="background-image: url({{ product.featured_image | image_url: width: 48 }});" aria-hidden="true"></span>
+    {%- endif -%}
+
+    <span class="product-card__price">{{ product.price | money }}</span>
+  </div>
+</a>
