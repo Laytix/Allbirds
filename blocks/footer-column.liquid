@@ -10,31 +10,33 @@
   data-accordion="collapse"
   {{ block.shopify_attributes }}
 >
-  <button
-    type="button"
-    class="footer-column__toggle"
-    data-accordion-target="#footer-col-{{ block.id }}"
-    aria-expanded="false"
-    aria-controls="footer-col-{{ block.id }}"
-  >
-    <span>{{ block.settings.heading }}</span>
-    <svg
-      data-accordion-icon
-      class="footer-column__toggle-icon"
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="3"
+  {%- if block.settings.heading != blank -%}
+    <button
+      type="button"
+      class="footer-column__toggle"
+      data-accordion-target="#footer-col-{{ block.id }}"
+      aria-expanded="false"
+      aria-controls="footer-col-{{ block.id }}"
     >
-      <path d="M6 9l6 6 6-6"/>
-    </svg>
-  </button>
+      <span>{{ block.settings.heading }}</span>
+      <svg
+        data-accordion-icon
+        class="footer-column__toggle-icon"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="3"
+      >
+        <path d="M6 9l6 6 6-6"/>
+      </svg>
+    </button>
 
-  <h3 class="footer-column__heading">
-    {{ block.settings.heading }}
-  </h3>
+    <h3 class="footer-column__heading">
+      {{ block.settings.heading }}
+    </h3>
+  {%- endif -%}
 
   <ul
     id="footer-col-{{ block.id }}"
@@ -68,12 +70,12 @@
     border-bottom: 1px solid;
     border-color: color-mix(in srgb, currentColor 12%, transparent);
     cursor: pointer;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
     color: inherit;
-    font-family: inherit;
   }
 
   .footer-column__toggle-icon {
@@ -96,12 +98,13 @@
   /* ===== Desktop heading ===== */
   .footer-column__heading {
     display: none;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
     margin: 0 0 1.25rem 0;
-    opacity: 0.9;
+    opacity: 0.85;
   }
 
   /* ===== Links ===== */
@@ -117,13 +120,12 @@
     font-size: 0.9375rem;
     text-decoration: none;
     color: inherit;
-    opacity: 0.6;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    opacity: 0.65;
+    transition: opacity 0.2s ease;
   }
 
   .footer-column__link:hover {
     opacity: 1;
-    transform: translateX(3px);
   }
 
   /* ===== Desktop overrides ===== */
