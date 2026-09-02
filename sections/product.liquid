@@ -1,50 +1,772 @@
 {% comment %}
-  This section is used in the product template to render product page with
-  media, content, and add-to-cart form.
+  Section: Product page
+  Allbirds-style: media card (1 hero tile + 2-col grid of remaining images) on
+  the left; sticky info card on the right (title, price, option swatches/pills,
+  description, AJAX add-to-cart that opens the cart drawer).
+{%- endcomment -%}
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/product
-{% endcomment %}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
 
-<div class="product-images">
-  {% for image in product.images %}
-    {% render 'image', class: 'product-image', image: image %}
-  {% endfor %}
+<div
+  class="product-page"
+  x-data="productForm"
+>
+  {%- comment -%} ── Media card ── {%- endcomment -%}
+  <div class="product-media">
+    <div class="product-media__tile product-media__tile--hero">
+      {%- if product.tags contains 'new' -%}
+        <span class="product-media__badge" aria-hidden="true">New</span>
+      {%- endif -%}
+
+      {%- if product.featured_image -%}
+        {{
+          product.featured_image
+          | image_url: width: 1600
+          | image_tag:
+            loading: 'eager',
+            fetchpriority: 'high',
+            widths: '800,1200,1600',
+            sizes: '(min-width: 1024px) 60vw, 100vw',
+            class: 'product-media__img'
+        }}
+      {%- endif -%}
+    </div>
+
+    {%- for image in product.images offset: 1 -%}
+      <div class="product-media__tile">
+        {{
+          image
+          | image_url: width: 1200
+          | image_tag:
+            loading: 'lazy',
+            widths: '600,900,1200',
+            sizes: '(min-width: 1024px) 30vw, 50vw',
+            class: 'product-media__img'
+        }}
+      </div>
+    {%- endfor -%}
+  </div>
+
+  {%- comment -%} ── Info card ── {%- endcomment -%}
+  <div class="product-info">
+    <h1 class="product-info__title">{{ product.title | escape }}</h1>
+
+    <p class="product-info__price" data-product-price data-initial="{{ current_variant.price | money }}" x-text="priceText"></p>
+
+    {%- assign carbon_val = product.metafields.custom.carbon_footprint | default: section.settings.carbon_footprint_default -%}
+    {%- if section.settings.show_carbon_footprint and carbon_val != blank -%}
+      <div class="product-info__carbon">
+        <span class="product-info__carbon-icon" aria-hidden="true">🌱</span>
+        <span>Carbon Footprint: {{ carbon_val | escape }}</span>
+      </div>
+    {%- endif -%}
+
+    <form method="post" action="{{ routes.cart_add_url }}" @submit.prevent="addToCart($event)">
+      <input type="hidden" name="quantity" value="1">
+
+      {%- comment -%} Hidden real select keeps the form working without JS {%- endcomment -%}
+      <select name="id" class="product-info__variant-select" x-model="variantId" aria-hidden="true" tabindex="-1">
+        {%- for variant in product.variants -%}
+          <option
+            value="{{ variant.id }}"
+            {% if variant == current_variant %}selected="selected"{% endif %}
+          >
+            {{ variant.title | escape }} — {{ variant.price | money }}
+          </option>
+        {%- endfor -%}
+      </select>
+
+      {%- unless product.has_only_default_variant -%}
+        {%- for option in product.options_with_values -%}
+        {%- liquid
+          assign option_name_lower = option.name | downcase
+          assign is_color = false
+          if option_name_lower == 'color' or option_name_lower == 'colour'
+            assign is_color = true
+          else
+            assign swatch_count = option.values | map: 'swatch' | compact | size
+            if swatch_count > 0
+              assign is_color = true
+            endif
+          endif
+          assign is_size = false
+          if option_name_lower == 'size'
+            assign is_size = true
+          endif
+        -%}
+
+        <fieldset class="product-option">
+          <div class="product-option__header">
+            <legend class="product-option__label">
+              {{ option.name | escape }}
+              {%- if is_color -%}
+                <span class="product-option__selected" x-text="options[optionName({{ forloop.index0 }})] || '{{ option.selected_value | escape }}'"></span>
+              {%- endif -%}
+            </legend>
+            {%- if is_size -%}
+              <button
+                type="button"
+                class="product-option__size-guide-btn"
+                @click="$store.ui.sizeGuideOpen = true"
+                aria-haspopup="dialog"
+              >
+                Size Guide
+              </button>
+            {%- endif -%}
+          </div>
+
+          {%- if is_color -%}
+            <div class="product-option__swatches">
+              {%- for value in option.values -%}
+                {%- assign value_available = false -%}
+                {%- for v in product.variants -%}
+                  {%- if v.options contains value.name and v.available -%}
+                    {%- assign value_available = true -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                <label
+                  class="product-option__swatch{% unless value_available %} is-unavailable{% endunless %}"
+                  :class="options[optionName({{ forloop.parentloop.index0 }})] === '{{ value.name | escape }}' && 'is-selected'"
+                >
+                  <input
+                    type="radio"
+                    name="{{ option.name | escape }}"
+                    value="{{ value.name | escape }}"
+                    {% if option.selected_value == value.name %}checked{% endif %}
+                    {% unless value_available %}disabled{% endunless %}
+                    @change="onOptionChange($event)"
+                  >
+                  <span
+                    class="product-option__swatch-dot"
+                    style="{% if value.swatch.color %}background-color: {{ value.swatch.color }};{% endif %} {% if value.swatch.image %}background-image: url({{ value.swatch.image | image_url: width: 48 }});{% endif %}"
+                    aria-hidden="true"
+                  ></span>
+                  <span class="product-option__sr">{{ value.name | escape }}</span>
+                </label>
+              {%- endfor -%}
+            </div>
+          {%- else -%}
+            <div class="product-option__pills">
+              {%- for value in option.values -%}
+                {%- assign value_available = false -%}
+                {%- for v in product.variants -%}
+                  {%- if v.options contains value.name and v.available -%}
+                    {%- assign value_available = true -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                <label
+                  class="product-option__pill{% unless value_available %} is-unavailable{% endunless %}"
+                  :class="options[optionName({{ forloop.parentloop.index0 }})] === '{{ value.name | escape }}' && 'is-selected'"
+                >
+                  <input
+                    type="radio"
+                    name="{{ option.name | escape }}"
+                    value="{{ value.name | escape }}"
+                    {% unless value_available %}disabled{% endunless %}
+                    @change="onOptionChange($event)"
+                  >
+                  <span>{{ value.name | escape }}</span>
+                </label>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </fieldset>
+      {%- endfor -%}
+      {%- endunless -%}
+
+      <div class="product-info__description rte">
+        {{ product.description }}
+      </div>
+
+      <button
+        type="submit"
+        class="product-info__add"
+        :disabled="!ready"
+        x-text="buttonLabel"
+      ></button>
+
+      {{ form | payment_button }}
+    </form>
+
+    {%- if section.settings.shipping_note != blank -%}
+      <p class="product-info__note">{{ section.settings.shipping_note | escape }}</p>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="product-accordions">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'accordion' -%}
+            {%- liquid
+              assign accordion_content = block.settings.content
+              if block.settings.metafield_key != blank
+                assign meta_key = block.settings.metafield_key
+                if product.metafields.custom[meta_key] != blank
+                  assign accordion_content = product.metafields.custom[meta_key]
+                endif
+              elsif block.settings.page_content != blank
+                assign accordion_content = block.settings.page_content.content
+              endif
+            -%}
+            {%- if block.settings.title != blank and accordion_content != blank -%}
+              <div
+                class="product-accordion"
+                x-data="{ isOpen: {{ block.settings.default_open | json }} }"
+                {{ block.shopify_attributes }}
+              >
+                <button
+                  type="button"
+                  class="product-accordion__header"
+                  @click="isOpen = !isOpen"
+                  :aria-expanded="isOpen"
+                >
+                  <span class="product-accordion__title">{{ block.settings.title | escape }}</span>
+                  <svg
+                    class="product-accordion__icon"
+                    :class="isOpen && 'is-open'"
+                    width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                <div class="product-accordion__collapse" :class="isOpen && 'is-expanded'">
+                  <div class="product-accordion__inner">
+                    <div class="product-accordion__content rte">
+                      {{ accordion_content }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} Variant data for the Alpine component {%- endcomment -%}
+  <script type="application/json" data-product-variants>
+    [
+      {%- for variant in product.variants -%}
+        {
+          "id": {{ variant.id }},
+          "options": {{ variant.options | json }},
+          "available": {{ variant.available }},
+          "price": {{ variant.price | money | json }}
+        }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  </script>
 </div>
 
-<div class="product-info">
-  <h1>{{ product.title }}</h1>
-  <p>{{ product.price | money }}</p>
-  <p>{{ product.description }}</p>
-</div>
+{% stylesheet %}
+  .product-page {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding-top: 5.5rem;
+  }
 
-<div class="product-form">
-  {% form 'product', product %}
-    {% assign current_variant = product.selected_or_first_available_variant %}
+  @media (min-width: 1024px) {
+    .product-page {
+      grid-template-columns: minmax(0, 1.5fr) clamp(320px, 30vw, 440px);
+      align-items: start;
+    }
+  }
 
-    <select name="id">
-      {% for variant in product.variants %}
-        <option
-          value="{{ variant.id }}"
-          {% if variant == current_variant %}
-            selected="selected"
-          {% endif %}
-        >
-          {{ variant.title }} - {{ variant.price | money }}
-        </option>
-      {% endfor %}
-    </select>
+  /* ===== Media card ===== */
+  .product-media {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    padding: 0.75rem;
+  }
 
-    <input type="text" name="quantity" min="1" value="1">
+  .product-media__tile {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
 
-    <input type="submit" value="Add to cart">
-    {{ form | payment_button }}
-  {% endform %}
-</div>
+  .product-media__tile--hero {
+    grid-column: 1 / -1;
+    aspect-ratio: 4 / 3;
+  }
+
+  .product-media__img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .product-media__badge {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 1;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background-color: color-mix(in srgb, var(--color-foreground) 10%, #ffffff);
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+  }
+
+  /* ===== Info card ===== */
+  .product-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    padding: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .product-info {
+      position: sticky;
+      top: 5.5rem;
+    }
+  }
+
+  .product-info__title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.875rem;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    .product-info__title {
+      font-size: 2.125rem;
+    }
+  }
+
+  .product-info__price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .product-info form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .product-info__note {
+    text-align: center;
+    font-size: 0.875rem;
+    opacity: 0.7;
+    margin: -0.5rem 0 0 0;
+  }
+
+  .product-info__variant-select {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  /* ===== Option groups ===== */
+  .product-option {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .product-option__label {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0;
+  }
+
+  .product-option__selected {
+    font-family: var(--font-primary--family, inherit);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0;
+    opacity: 1;
+  }
+
+  .product-option__sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .product-option__swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .product-option__swatch {
+    position: relative;
+    cursor: pointer;
+    display: inline-flex;
+  }
+
+  .product-option__swatch input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .product-option__swatch-dot {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+    background-size: cover;
+    background-position: center;
+    transition: box-shadow 0.15s ease;
+  }
+
+  .product-option__swatch input:checked + .product-option__swatch-dot {
+    box-shadow: 0 0 0 2.5px var(--color-background), 0 0 0 4px var(--color-foreground);
+  }
+
+  .product-option__swatch input:focus-visible + .product-option__swatch-dot {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: 3px;
+  }
+
+  .product-option__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .product-option__pill {
+    position: relative;
+    cursor: pointer;
+    display: inline-flex;
+  }
+
+  .product-option__pill input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .product-option__pill span {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+    border-radius: 0.375rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .product-option__pill:hover span {
+    border-color: currentColor;
+  }
+
+  .product-option__pill input:checked + span {
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+    border-color: var(--color-foreground);
+  }
+
+  .product-option__pill input:focus-visible + span {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: 2px;
+  }
+
+  .product-option__swatch.is-unavailable .product-option__swatch-dot {
+    opacity: 0.35;
+  }
+
+  .product-option__swatch.is-unavailable .product-option__swatch-dot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top left,
+      transparent 46%,
+      currentColor 46%,
+      currentColor 54%,
+      transparent 54%
+    );
+    opacity: 0.5;
+    border-radius: 50%;
+  }
+
+  .product-option__pill.is-unavailable {
+    cursor: not-allowed;
+  }
+
+  .product-option__pill.is-unavailable span {
+    color: color-mix(in srgb, var(--color-foreground) 35%, transparent);
+    border-color: color-mix(in srgb, var(--color-foreground) 12%, transparent);
+  }
+
+  .product-option__pill.is-unavailable span::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top left,
+      transparent 49.5%,
+      color-mix(in srgb, var(--color-foreground) 30%, transparent) 49.5%,
+      color-mix(in srgb, var(--color-foreground) 30%, transparent) 50.5%,
+      transparent 50.5%
+    );
+  }
+
+  /* ===== Description + actions ===== */
+  .product-info__description {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    opacity: 0.8;
+  }
+
+  .product-info__add {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    border-radius: 9999px;
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+    border: 1.5px solid var(--color-foreground);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: opacity 0.2s ease;
+  }
+
+  .product-info__add:disabled {
+    background-color: color-mix(in srgb, var(--color-foreground) 8%, #ffffff);
+    color: color-mix(in srgb, var(--color-foreground) 40%, #ffffff);
+    border-color: transparent;
+    cursor: default;
+  }
+
+  .product-info__add:not(:disabled):hover {
+    opacity: 0.85;
+  }
+
+  .product-info form .shopify-payment-button {
+    margin-top: 0.75rem;
+  }
+
+  /* ===== Carbon footprint tag ===== */
+  .product-info__carbon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-foreground) 75%, transparent);
+    background-color: color-mix(in srgb, var(--color-foreground) 4%, #ffffff);
+    border: 1px solid color-mix(in srgb, var(--color-foreground) 10%, transparent);
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    margin-top: -0.5rem;
+    align-self: flex-start;
+  }
+
+  /* ===== Option header + size guide trigger ===== */
+  .product-option__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .product-option__size-guide-btn {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
+    transition: color 0.15s ease;
+  }
+
+  .product-option__size-guide-btn:hover {
+    color: var(--color-foreground);
+  }
+
+  /* ===== Product accordions ===== */
+  .product-accordions {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.75rem;
+    border-top: 1px solid color-mix(in srgb, var(--color-foreground) 10%, transparent);
+  }
+
+  .product-accordion {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-foreground) 10%, transparent);
+  }
+
+  .product-accordion__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    color: var(--color-foreground);
+  }
+
+  .product-accordion__title {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .product-accordion__icon {
+    flex-shrink: 0;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    color: color-mix(in srgb, var(--color-foreground) 60%, transparent);
+  }
+
+  .product-accordion__icon.is-open {
+    transform: rotate(180deg);
+  }
+
+  .product-accordion__collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .product-accordion__collapse.is-expanded {
+    grid-template-rows: 1fr;
+  }
+
+  .product-accordion__inner {
+    overflow: hidden;
+  }
+
+  .product-accordion__content {
+    padding-bottom: 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--color-foreground) 80%, transparent);
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
   "name": "t:general.product",
-  "settings": [],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_carbon_footprint",
+      "label": "Show Carbon Footprint badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "carbon_footprint_default",
+      "label": "Default Carbon Footprint",
+      "default": "5.4 kg CO2e"
+    },
+    {
+      "type": "text",
+      "id": "shipping_note",
+      "label": "Shipping note",
+      "info": "Shown under the add-to-cart button. Leave blank to hide.",
+      "default": "Free Shipping on Orders over $100"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "accordion",
+      "name": "Accordion Item",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Heading", "default": "Highlights" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Ultra-breathable natural materials engineered for all-day comfort and lightweight movement.</p>" },
+        { "type": "page", "id": "page_content", "label": "Page content (optional)", "info": "Display content from a Shopify Page instead of the text above." },
+        { "type": "text", "id": "metafield_key", "label": "Product metafield key (optional)", "info": "e.g. materials_info — pulls from product.metafields.custom[metafield_key], overriding the content above." },
+        { "type": "checkbox", "id": "default_open", "label": "Open by default", "default": false }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Default Product",
+      "blocks": [
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "Highlights",
+            "content": "<p>• Silky-smooth, breathable natural fibers engineered for all-day thermoregulation.<br>• SweetFoam® midsole made with sugarcane-based EVA for lightweight bounce.<br>• Contoured heel counter and supportive insole for comfortable walking.<br>• Minimalist, versatile profile designed to wear with or without socks.</p>",
+            "default_open": false
+          }
+        },
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "Materials & Sustainability",
+            "content": "<p>• Upper: FSC®-certified eucalyptus tree fiber & ZQ-certified Merino wool.<br>• Midsole: SweetFoam® crafted from renewable sugarcane.<br>• Insole: Castor bean oil-based foam lined with Merino wool.<br>• Laces: 100% recycled polyester made from post-consumer plastic bottles.</p>",
+            "default_open": false
+          }
+        },
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "Care Guide",
+            "content": "<p>Machine washable on gentle / cold cycle. Remove insoles and laces prior to washing and place in a delicates bag. Air dry only — never tumble dry or expose to direct heat.</p>",
+            "default_open": false
+          }
+        },
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "Shipping & Free Returns",
+            "content": "<p>Free standard shipping on all orders over $100. We offer a 30-day trial — wear them, test them, and if you're not completely satisfied, return or exchange them for free.</p>",
+            "default_open": false
+          }
+        }
+      ]
+    }
+  ],
   "disabled_on": {
     "groups": ["header", "footer"]
   }
