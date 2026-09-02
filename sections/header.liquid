@@ -1,35 +1,141 @@
-<header>
-  <h2 class="header__title">
-    {{ shop.name | link_to: routes.root_url }}
-  </h2>
+<header x-data>
+  <div class="header__lead flex items-center gap-3">
+    <button
+      @click="$store.ui.toggleMobileMenu()"
+      class="md:hidden flex items-center justify-center"
+      aria-label="{{ 'general.header.menu' | t }}"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
 
-  <div class="header__menu">
+    <h2 class="header__title">
+      {{ shop.name | link_to: routes.root_url }}
+    </h2>
+  </div>
+
+  <nav class="header__menu hidden md:flex gap-4">
     {% for link in section.settings.menu.links %}
       {{ link.title | link_to: link.url }}
     {% endfor %}
-  </div>
+  </nav>
 
-  <div class="header__icons">
+  <div class="header__icons flex gap-4">
     {% if shop.customer_accounts_enabled %}
       <shopify-account menu="{{ section.settings.customer_account_menu }}">
         {{ 'icon-account.svg' | inline_asset_content }}
       </shopify-account>
     {% endif %}
 
-    <a href="{{ routes.cart_url }}">
-      {% if cart.item_count > 0 %}
-        <sup>{{ cart.item_count }}</sup>
-      {% endif %}
-
+    <a
+      href="{{ routes.cart_url }}"
+      @click.prevent="$store.ui.toggleCartDrawer()"
+    >
+      <span
+        x-text="$store.cart.count"
+        x-show="$store.cart.count > 0"
+        class="absolute left-full overflow-hidden text-xs font-bold"
+        style="max-width: var(--page-margin)"
+      ></span>
       {{ 'icon-cart.svg' | inline_asset_content }}
     </a>
+  </div>
+
+  {% comment %} Mobile menu drawer {% endcomment %}
+  <div
+    x-show="$store.ui.mobileMenuOpen"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    @click.self="$store.ui.closeAll()"
+    class="fixed inset-0 z-40 md:hidden backdrop-blur-sm"
+    style="background: linear-gradient(160deg, rgba(0,0,0,0.7) 0%, rgba(20,20,45,0.5) 100%);"
+    x-cloak
+  >
+    <nav
+      x-show="$store.ui.mobileMenuOpen"
+      x-transition:enter="transition ease-out duration-500"
+      x-transition:enter-start="-translate-x-full"
+      x-transition:enter-end="translate-x-0"
+      x-transition:leave="transition ease-in duration-200"
+      x-transition:leave-start="translate-x-0"
+      x-transition:leave-end="-translate-x-full"
+      @click.stop
+      class="fixed top-0 left-0 h-full w-80 max-w-[85vw] z-50 overflow-y-auto flex flex-col"
+      style="background: var(--color-background); font-family: var(--font-primary--family);"
+    >
+      {% comment %} Accent strip {% endcomment %}
+      <div class="mobile-nav-accent" style="background: linear-gradient(90deg, color-mix(in srgb, var(--color-foreground) 55%, transparent), color-mix(in srgb, var(--color-foreground) 15%, transparent));"></div>
+
+      {% comment %} Header row {% endcomment %}
+      <div class="flex items-center justify-between p-6 pb-4">
+        <span class="brand-wordmark" style="color: var(--color-foreground);">
+          {{ shop.name }}
+        </span>
+        <button
+          @click="$store.ui.closeAll()"
+          aria-label="{{ 'general.header.close' | t }}"
+          class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
+          style="background: color-mix(in srgb, var(--color-foreground) 8%, transparent);"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      {% comment %} Shop label {% endcomment %}
+      <div class="px-6 pb-3">
+        <span class="text-xs tracking-[0.2em] uppercase font-bold" style="color: color-mix(in srgb, var(--color-foreground) 40%, transparent);">Shop</span>
+      </div>
+
+      {% comment %} Navigation links {% endcomment %}
+      <div class="flex flex-col px-6 pb-10 flex-1">
+        {% for link in section.settings.menu.links %}
+          <a
+            href="{{ link.url }}"
+            class="py-5 text-3xl font-bold no-underline transition-all duration-200 hover:translate-x-2"
+            style="color: var(--color-foreground); border-bottom: 3px solid; border-color: color-mix(in srgb, var(--color-foreground) 12%, transparent); justify-content: flex-start;"
+            @click="$store.ui.closeAll()"
+          >
+            {{ link.title }}
+          </a>
+        {% endfor %}
+      </div>
+
+      {% comment %} Footer {% endcomment %}
+      <div class="p-6 flex flex-col gap-2" style="background: color-mix(in srgb, var(--color-foreground) 5%, transparent); border-top: 3px solid; border-color: color-mix(in srgb, var(--color-foreground) 10%, transparent);">
+        {% if shop.customer_accounts_enabled %}
+          <a href="{{ routes.account_url }}" class="flex items-center gap-3 py-3 no-underline text-base font-semibold transition-all duration-200 hover:translate-x-1" style="color: var(--color-foreground); justify-content: flex-start;">
+            {{ 'icon-account.svg' | inline_asset_content }}
+            <span>{{ 'customers.login.title' | t }}</span>
+          </a>
+        {% endif %}
+        <a
+          href="{{ routes.cart_url }}"
+          class="flex items-center gap-3 py-3 no-underline text-base font-semibold transition-all duration-200 hover:translate-x-1"
+          style="color: var(--color-foreground); justify-content: flex-start;"
+          @click.prevent="$store.ui.closeAll(); $store.ui.toggleCartDrawer();"
+        >
+          {{ 'icon-cart.svg' | inline_asset_content }}
+          <span>{{ 'cart.title' | t }}</span>
+          <span x-text="'(' + $store.cart.count + ')'" x-show="$store.cart.count > 0" class="opacity-50 text-sm"></span>
+        </a>
+      </div>
+    </nav>
   </div>
 </header>
 
 {% stylesheet %}
   header {
     position: fixed;
-    /* Slider sits at 0.75rem from viewport edges; header inset a further 0.5rem inside */
     top: 1.25rem;
     left: 1.25rem;
     right: 1.25rem;
@@ -49,7 +155,8 @@
   header h2 a,
   header .header__menu a,
   header .header__icons a,
-  header .header__icons shopify-account {
+  header .header__icons shopify-account,
+  header .header__icons button {
     color: var(--color-foreground);
     text-decoration: none;
   }
@@ -61,27 +168,66 @@
     justify-content: center;
   }
 
-  header a sup {
-    position: absolute;
-    left: 100%;
-    overflow: hidden;
-    max-width: var(--page-margin);
+  header .header__title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 1.625rem;
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+    min-width: 0;
   }
 
-  header .header__title {
-    font-weight: bold;
+  .brand-wordmark {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 1.875rem;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+  }
+
+  header .header__title a {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    /* Italic descenders (g, y) swing below the line box — give them room */
+    padding-bottom: 0.12em;
   }
 
   header svg {
     width: 1.75rem;
+    height: 1.75rem;
+    flex: none;
     fill: var(--color-foreground);
     color: var(--color-foreground);
   }
 
   header .header__menu,
   header .header__icons {
-    display: flex;
     gap: 1rem;
+  }
+
+  /* Icons never yield to flex pressure — the title truncates instead */
+  header .header__icons {
+    flex-shrink: 0;
+  }
+
+  header .header__lead {
+    min-width: 0;
+  }
+
+  header button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .mobile-nav-accent {
+    height: 4px;
+    width: 100%;
   }
 {% endstylesheet %}
 
