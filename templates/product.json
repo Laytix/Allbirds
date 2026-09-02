@@ -11,7 +11,51 @@
   "sections": {
     "main": {
       "type": "product",
-      "settings": {}
+      "settings": {
+        "show_carbon_footprint": true,
+        "carbon_footprint_default": "5.4 kg CO2e",
+        "shipping_note": "Free Shipping on Orders over $100"
+      },
+      "blocks": {
+        "accordion_highlights": {
+          "type": "accordion",
+          "settings": {
+            "title": "Highlights",
+            "content": "<p>• Silky-smooth, breathable natural fibers engineered for all-day thermoregulation.<br>• SweetFoam® midsole made with sugarcane-based EVA for lightweight bounce.<br>• Contoured heel counter and supportive insole for comfortable walking.<br>• Minimalist, versatile profile designed to wear with or without socks.</p>",
+            "default_open": false
+          }
+        },
+        "accordion_materials": {
+          "type": "accordion",
+          "settings": {
+            "title": "Materials & Sustainability",
+            "content": "<p>• Upper: FSC®-certified eucalyptus tree fiber & ZQ-certified Merino wool.<br>• Midsole: SweetFoam® crafted from renewable sugarcane.<br>• Insole: Castor bean oil-based foam lined with Merino wool.<br>• Laces: 100% recycled polyester made from post-consumer plastic bottles.</p>",
+            "default_open": false
+          }
+        },
+        "accordion_care": {
+          "type": "accordion",
+          "settings": {
+            "title": "Care Guide",
+            "content": "<p>Machine washable on gentle / cold cycle. Remove insoles and laces prior to washing and place in a delicates bag. Air dry only — never tumble dry or expose to direct heat.</p>",
+            "default_open": false
+          }
+        },
+        "accordion_shipping": {
+          "type": "accordion",
+          "settings": {
+            "title": "Shipping & Free Returns",
+            "content": "<p>Free standard shipping on all orders over $100. We offer a 30-day trial — wear them, test them, and if you're not completely satisfied, return or exchange them for free.</p>",
+            "default_open": false
+          }
+        }
+      },
+      "block_order": [
+        "accordion_highlights",
+        "accordion_materials",
+        "accordion_care",
+        "accordion_shipping"
+      ]
     }
   },
   "order": [
