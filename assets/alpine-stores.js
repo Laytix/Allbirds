@@ -78,6 +78,7 @@ document.addEventListener('alpine:init', () => {
     mobileMenuOpen: false,
     cartDrawerOpen: false,
     searchOpen: false,
+    sizeGuideOpen: false,
 
     toggleMobileMenu() {
       this.mobileMenuOpen = !this.mobileMenuOpen;
@@ -95,6 +96,7 @@ document.addEventListener('alpine:init', () => {
       this.mobileMenuOpen = false;
       this.cartDrawerOpen = false;
       this.searchOpen = false;
+      this.sizeGuideOpen = false;
     },
   });
 
