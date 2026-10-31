@@ -1,4 +1,11 @@
-<header x-data>
+<div
+  class="header-section"
+  x-data="{ openMenu: null, activeMenu: null, hoverTimer: null, openAccordion: null }"
+  @focusout="if (!$el.contains($event.relatedTarget)) openMenu = null"
+>
+  <header
+    @mouseleave="clearTimeout(hoverTimer); hoverTimer = setTimeout(() => openMenu = null, 200)"
+  >
   <div class="header__lead flex items-center gap-3">
     <button
       @click="$store.ui.toggleMobileMenu()"
@@ -17,9 +24,25 @@
     </h2>
   </div>
 
-  <nav class="header__menu hidden md:flex gap-4">
+  <nav class="header__menu hidden md:flex gap-4" aria-label="Main navigation">
     {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
+      {% if link.links.size > 0 %}
+        <a
+          href="{{ link.url }}"
+          class="nav-link nav-link--trigger"
+          :class="openMenu === {{ forloop.index0 }} && 'nav-link--open'"
+          :aria-expanded="openMenu === {{ forloop.index0 }} ? 'true' : 'false'"
+          aria-haspopup="true"
+          @mouseenter="clearTimeout(hoverTimer); activeMenu = {{ forloop.index0 }}; openMenu === null ? hoverTimer = setTimeout(() => openMenu = {{ forloop.index0 }}, 80) : openMenu = {{ forloop.index0 }}"
+          @focus="clearTimeout(hoverTimer); activeMenu = {{ forloop.index0 }}; openMenu = {{ forloop.index0 }}"
+        >{{ link.title }}</a>
+      {% else %}
+        <a
+          href="{{ link.url }}"
+          class="nav-link"
+          @mouseenter="clearTimeout(hoverTimer); openMenu = null"
+        >{{ link.title }}</a>
+      {% endif %}
     {% endfor %}
   </nav>
 
@@ -32,7 +55,7 @@
 
     <a
       href="{{ routes.cart_url }}"
-      @click.prevent="$store.ui.toggleCartDrawer()"
+      @click.prevent="openMenu = null; $store.ui.toggleCartDrawer()"
     >
       <span
         x-text="$store.cart.count"
@@ -99,14 +122,52 @@
       {% comment %} Navigation links {% endcomment %}
       <div class="flex flex-col px-6 pb-10 flex-1">
         {% for link in section.settings.menu.links %}
-          <a
-            href="{{ link.url }}"
-            class="py-5 text-3xl font-bold no-underline transition-all duration-200 hover:translate-x-2"
-            style="color: var(--color-foreground); border-bottom: 3px solid; border-color: color-mix(in srgb, var(--color-foreground) 12%, transparent); justify-content: flex-start;"
-            @click="$store.ui.closeAll()"
-          >
-            {{ link.title }}
-          </a>
+          {% if link.links.size > 0 %}
+            <div class="mobile-nav-accordion">
+              <button
+                type="button"
+                class="mobile-nav-accordion__toggle"
+                :aria-expanded="openAccordion === {{ forloop.index0 }} ? 'true' : 'false'"
+                @click="openAccordion = openAccordion === {{ forloop.index0 }} ? null : {{ forloop.index0 }}"
+              >
+                {{ link.title }}
+                <svg
+                  class="mobile-nav-accordion__chevron"
+                  :class="openAccordion === {{ forloop.index0 }} && 'is-open'"
+                  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                >
+                  <path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </button>
+              <div class="mobile-nav-accordion__panel" :class="openAccordion === {{ forloop.index0 }} && 'is-open'">
+                <div>
+                  {% for child in link.links %}
+                    <a
+                      href="{{ child.url }}"
+                      class="mobile-nav-sublink"
+                      @click="$store.ui.closeAll()"
+                    >{{ child.title }}</a>
+                    {% for grandchild in child.links %}
+                      <a
+                        href="{{ grandchild.url }}"
+                        class="mobile-nav-sublink mobile-nav-sublink--deep"
+                        @click="$store.ui.closeAll()"
+                      >{{ grandchild.title }}</a>
+                    {% endfor %}
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          {% else %}
+            <a
+              href="{{ link.url }}"
+              class="py-5 text-3xl font-bold no-underline transition-all duration-200 hover:translate-x-2"
+              style="color: var(--color-foreground); border-bottom: 3px solid; border-color: color-mix(in srgb, var(--color-foreground) 12%, transparent); justify-content: flex-start;"
+              @click="$store.ui.closeAll()"
+            >
+              {{ link.title }}
+            </a>
+          {% endif %}
         {% endfor %}
       </div>
 
@@ -131,10 +192,43 @@
       </div>
     </nav>
   </div>
-</header>
+  </header>
+
+  <div
+    class="header__mega"
+    :class="openMenu !== null && 'header__mega--open'"
+    @mouseenter="clearTimeout(hoverTimer)"
+    @mouseleave="clearTimeout(hoverTimer); hoverTimer = setTimeout(() => openMenu = null, 200)"
+    @keydown.escape.window="openMenu = null"
+  >
+    <div class="header__mega-content">
+      {% for link in section.settings.menu.links %}
+        {% if link.links.size > 0 %}
+          <div
+            class="header__mega-panel"
+            :class="activeMenu === {{ forloop.index0 }} && 'is-active'"
+          >
+            <div class="header__mega-strip">{{ link.title }}</div>
+            <div class="header__mega-columns">
+              {% for child in link.links %}
+                <div class="header__mega-col">
+                  <a href="{{ child.url }}" class="header__mega-heading">{{ child.title }}</a>
+                  {% for grandchild in child.links %}
+                    <a href="{{ grandchild.url }}" class="header__mega-link">{{ grandchild.title }}</a>
+                  {% endfor %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
 
 {% stylesheet %}
   header {
+    --icon-stroke-width: 1.5;
     position: fixed;
     top: 1.25rem;
     left: 1.25rem;
@@ -200,7 +294,7 @@
     width: 1.75rem;
     height: 1.75rem;
     flex: none;
-    fill: var(--color-foreground);
+    fill: none;
     color: var(--color-foreground);
   }
 
@@ -228,6 +322,196 @@
   .mobile-nav-accent {
     height: 4px;
     width: 100%;
+  }
+
+  /* ---- Desktop nav links ---- */
+  header .header__menu .nav-link {
+    position: relative;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.25rem 0;
+    white-space: nowrap;
+  }
+
+  header .header__menu .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 2px;
+    background: var(--color-foreground);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+
+  header .header__menu .nav-link:hover::after,
+  header .header__menu .nav-link--open::after {
+    transform: scaleX(1);
+  }
+
+  /* ---- Mega menu panel (sibling of the navbar, slides from top of screen) ---- */
+  .header__mega {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 45;
+    background: var(--color-background);
+    color: var(--color-foreground);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12);
+    transform: translateY(-101%);
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform 0.45s cubic-bezier(0.33, 1, 0.68, 1), visibility 0s 0.45s;
+  }
+
+  .header__mega--open {
+    transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
+    transition: transform 0.45s cubic-bezier(0.33, 1, 0.68, 1), visibility 0s;
+  }
+
+  .header__mega a {
+    color: var(--color-foreground);
+    text-decoration: none;
+  }
+
+  .header__mega-content {
+    display: grid;
+    padding-top: 5rem;
+  }
+
+  .header__mega-panel {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0s 0.2s;
+  }
+
+  .header__mega-panel.is-active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.2s ease, visibility 0s;
+  }
+
+  .header__mega-strip {
+    padding: 0.85rem 2.5rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    background: color-mix(in srgb, var(--color-foreground) 8%, transparent);
+  }
+
+  .header__mega-columns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.5rem 4rem;
+    max-width: 75rem;
+    margin: 0 auto;
+    padding: 2.25rem 2.5rem 3rem;
+  }
+
+  .header__mega-col {
+    min-width: 10rem;
+  }
+
+  .header__mega-heading {
+    display: block;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.8125rem;
+    letter-spacing: 0.06em;
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+
+  .header__mega-link {
+    display: block;
+    padding: 0.3rem 0;
+    font-size: 0.925rem;
+    text-align: left;
+    opacity: 0.85;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .header__mega-link:hover {
+    opacity: 1;
+    transform: translateX(3px);
+  }
+
+  @media (max-width: 767px) {
+    .header__mega {
+      display: none;
+    }
+  }
+
+  /* ---- Mobile nav accordions ---- */
+  .mobile-nav-accordion__toggle {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 0;
+    background: none;
+    border: none;
+    border-bottom: 3px solid;
+    border-color: color-mix(in srgb, var(--color-foreground) 12%, transparent);
+    cursor: pointer;
+    text-align: left;
+    color: var(--color-foreground);
+    font-family: inherit;
+    font-size: 1.875rem;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+
+  .mobile-nav-accordion__chevron {
+    flex: none;
+    transition: transform 0.25s ease;
+  }
+
+  .mobile-nav-accordion__chevron.is-open {
+    transform: rotate(180deg);
+  }
+
+  .mobile-nav-accordion__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+  }
+
+  .mobile-nav-accordion__panel > div {
+    overflow: hidden;
+  }
+
+  .mobile-nav-accordion__panel.is-open {
+    grid-template-rows: 1fr;
+  }
+
+  .mobile-nav-sublink {
+    display: block;
+    padding: 0.6rem 0;
+    color: var(--color-foreground);
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 500;
+    opacity: 0.8;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .mobile-nav-sublink--deep {
+    padding-left: 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  .mobile-nav-sublink:hover {
+    opacity: 1;
+    transform: translateX(3px);
   }
 {% endstylesheet %}
 
