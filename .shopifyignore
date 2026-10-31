@@ -1,0 +1,16 @@
+node_modules/
+tailwind-input.css
+tailwind.config.js
+package.json
+package-lock.json
+postcss.config.js
+CLAUDE.md
+.claude/
+.mcp.json
+.git/
+.github/
+*.md
+.shopifyignore
+.editorconfig
+.prettierrc
+.eslintrc*

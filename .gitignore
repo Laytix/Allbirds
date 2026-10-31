@@ -3,10 +3,6 @@ node_modules/
 
 # Shopify CLI
 .shopify/
-*.shopifyignore
-
-# Generated assets (Tailwind output)
-assets/application.css
 
 # Environment
 .env
@@ -27,6 +23,10 @@ Thumbs.db
 # Build output
 dist/
 build/
+
+# Agent / tooling artifacts
+.firecrawl/
+.omo/
 
 # Config files (not needed in git — generated or environment-specific)
 postcss.config.js
