@@ -1,4 +1,4 @@
-<div class="featured-collections">
+<div class="featured-collections full-width">
   {%- for i in (1..4) -%}
     {%- assign image_setting  = 'image_'  | append: i -%}
     {%- assign title_setting  = 'title_'  | append: i -%}
@@ -7,41 +7,52 @@
 
     {%- assign card_image  = section.settings[image_setting] -%}
     {%- assign card_title  = section.settings[title_setting] | default: 'Collection' -%}
-    {%- assign col_a       = collections[section.settings[col_a_setting]] -%}
-    {%- assign col_b       = collections[section.settings[col_b_setting]] -%}
+    {%- assign col_a       = section.settings[col_a_setting] -%}
+    {%- assign col_b       = section.settings[col_b_setting] -%}
 
     {%- assign has_col_a = false -%}
     {%- assign has_col_b = false -%}
-    {%- if section.settings[col_a_setting] != blank and col_a != empty -%}
+    {%- if col_a != blank -%}
       {%- assign has_col_a = true -%}
     {%- endif -%}
-    {%- if section.settings[col_b_setting] != blank and col_b != empty -%}
+    {%- if col_b != blank -%}
       {%- assign has_col_b = true -%}
     {%- endif -%}
 
+    {%- comment -%} Whole card links to the first collection, or all products {%- endcomment -%}
+    {%- assign card_link = col_a | default: col_b -%}
+    {%- assign card_url  = card_link.url | default: routes.all_products_collection_url -%}
+
     <div class="featured-collections__item">
 
-      {%- comment -%} Image {%- endcomment -%}
-      {%- if card_image -%}
-        {{
-          card_image
-          | image_url: width: 800
-          | image_tag:
-            loading: 'lazy',
-            class: 'featured-collections__img',
-            widths: '400,600,800',
-            sizes: '(max-width: 640px) calc(50vw - 1.125rem), (max-width: 1024px) calc(25vw - 1.125rem), calc(25vw - 1.5rem)'
-        }}
-      {%- else -%}
-        <div class="featured-collections__placeholder"></div>
-      {%- endif -%}
+      {%- comment -%} Image — wrapped in the card link {%- endcomment -%}
+      <a
+        class="featured-collections__card-link"
+        href="{{ card_url }}"
+        aria-label="{{ card_title | escape }}"
+        tabindex="-1"
+      >
+        {%- if card_image -%}
+          {{
+            card_image
+            | image_url: width: 800
+            | image_tag:
+              loading: 'lazy',
+              class: 'featured-collections__img',
+              widths: '400,600,800',
+              sizes: '(max-width: 640px) calc(50vw - 1.125rem), (max-width: 1024px) calc(25vw - 1.125rem), calc(25vw - 1.5rem)'
+          }}
+        {%- else -%}
+          <div class="featured-collections__placeholder"></div>
+        {%- endif -%}
+      </a>
 
       {%- comment -%} Overlay with title + hover collection links {%- endcomment -%}
       <div class="featured-collections__overlay">
 
         {%- comment -%} Default label — fades up and out on hover {%- endcomment -%}
         <div class="featured-collections__default">
-          <span class="featured-collections__pill">{{ card_title }}</span>
+          <a href="{{ card_url }}" class="featured-collections__pill">{{ card_title }}</a>
         </div>
 
         {%- comment -%} Hover state — collection(s) fade up into view {%- endcomment -%}
@@ -57,7 +68,7 @@
             </a>
           {%- endif -%}
           {%- unless has_col_a or has_col_b -%}
-            <span class="featured-collections__pill">{{ card_title }}</span>
+            <a href="{{ card_url }}" class="featured-collections__pill">{{ card_title }}</a>
           {%- endunless -%}
         </div>
 
@@ -82,6 +93,13 @@
     aspect-ratio: 3 / 4;
     background: #1a1a1a;
     cursor: pointer;
+  }
+
+  /* Full-card link — sits under the overlay, which stays click-through */
+  .featured-collections__card-link {
+    position: absolute;
+    inset: 0;
+    display: block;
   }
 
   /* ── Image ── */
@@ -110,6 +128,8 @@
     inset: 0;
     background: rgba(0, 0, 0, 0.18);
     transition: background 0.4s ease;
+    /* Let clicks pass through to the card link; pills re-enable themselves */
+    pointer-events: none;
   }
 
   .featured-collections__item:hover .featured-collections__overlay {
@@ -127,31 +147,38 @@
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    transition: opacity 0.38s ease, transform 0.38s ease;
+    transition: opacity 0.38s ease, transform 0.38s ease, visibility 0s 0.38s;
   }
 
   /* Default: centered, fully visible */
   .featured-collections__default {
     opacity: 1;
+    visibility: visible;
     transform: translateY(-50%);
+    transition: opacity 0.38s ease, transform 0.38s ease, visibility 0s;
   }
 
   /* Hover layer: starts centered but shifted down slightly, hidden */
   .featured-collections__hover {
     opacity: 0;
+    visibility: hidden;
     transform: translateY(calc(-50% + 12px));
   }
 
   /* On hover: default fades up and out */
   .featured-collections__item:hover .featured-collections__default {
     opacity: 0;
+    visibility: hidden;
     transform: translateY(calc(-50% - 12px));
+    transition: opacity 0.38s ease, transform 0.38s ease, visibility 0s 0.38s;
   }
 
   /* On hover: collection links fade up into center */
   .featured-collections__item:hover .featured-collections__hover {
     opacity: 1;
+    visibility: visible;
     transform: translateY(-50%);
+    transition: opacity 0.38s ease, transform 0.38s ease, visibility 0s;
   }
 
   /* ── Pill base ── */
@@ -169,6 +196,8 @@
     letter-spacing: 0.02em;
     white-space: nowrap;
     text-decoration: none;
+    /* Re-enable clicks on top of the click-through overlay */
+    pointer-events: auto;
   }
 
   /* Collection link pills get a subtle fill on their own hover */

@@ -32,7 +32,9 @@
 
 <a href="{{ product.url }}" class="product-card">
   <div class="product-card__media">
-    {%- if product.tags contains 'new' -%}
+    {%- assign tag_string = product.tags | join: ',' | downcase -%}
+    {%- assign tag_string = ',' | append: tag_string | append: ',' -%}
+    {%- if tag_string contains ',new,' -%}
       <span class="product-card__badge" aria-hidden="true">New</span>
     {%- endif -%}
 

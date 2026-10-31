@@ -4,19 +4,33 @@
     current: 0,
     total: 2,
     autoplay: null,
+    reduced: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     init() {
+      if (!this.reduced) this.startAutoplay();
+    },
+    startAutoplay() {
+      if (this.reduced) return;
+      this.stopAutoplay();
       this.autoplay = setInterval(() => {
         this.current = (this.current + 1) % this.total;
       }, 5000);
     },
+    stopAutoplay() {
+      clearInterval(this.autoplay);
+      this.autoplay = null;
+    },
     go(index) {
       this.current = index;
-      clearInterval(this.autoplay);
-      this.autoplay = setInterval(() => {
-        this.current = (this.current + 1) % this.total;
-      }, 5000);
+      this.startAutoplay();
+    },
+    destroy() {
+      this.stopAutoplay();
     }
   }"
+  @mouseenter="stopAutoplay()"
+  @mouseleave="startAutoplay()"
+  @focusin="stopAutoplay()"
+  @focusout="startAutoplay()"
 >
 
   {%- comment -%} ── Slides ── {%- endcomment -%}
@@ -110,28 +124,31 @@
 
       <div class="hero-slider__buttons">
 
-        {%- if section.settings.collection_1 != blank -%}
+        {%- assign cta_1 = section.settings.collection_1 -%}
+        {%- assign cta_2 = section.settings.collection_2 -%}
+
+        {%- if cta_1 != blank -%}
           <a
-            href="{{ collections[section.settings.collection_1].url }}"
+            href="{{ cta_1.url }}"
             class="hero-slider__btn hero-slider__btn--primary"
           >
-            {{- section.settings.button_1_label | default: collections[section.settings.collection_1].title -}}
+            {{- section.settings.button_1_label | default: cta_1.title -}}
           </a>
         {%- else -%}
-          <a href="#" class="hero-slider__btn hero-slider__btn--primary">
+          <a href="{{ routes.all_products_collection_url }}" class="hero-slider__btn hero-slider__btn--primary">
             {{- section.settings.button_1_label | default: 'Shop Men' -}}
           </a>
         {%- endif -%}
 
-        {%- if section.settings.collection_2 != blank -%}
+        {%- if cta_2 != blank -%}
           <a
-            href="{{ collections[section.settings.collection_2].url }}"
+            href="{{ cta_2.url }}"
             class="hero-slider__btn hero-slider__btn--secondary"
           >
-            {{- section.settings.button_2_label | default: collections[section.settings.collection_2].title -}}
+            {{- section.settings.button_2_label | default: cta_2.title -}}
           </a>
         {%- else -%}
-          <a href="#" class="hero-slider__btn hero-slider__btn--secondary">
+          <a href="{{ routes.all_products_collection_url }}" class="hero-slider__btn hero-slider__btn--secondary">
             {{- section.settings.button_2_label | default: 'Shop Women' -}}
           </a>
         {%- endif -%}

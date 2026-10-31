@@ -657,3 +657,16 @@
   margin: 0;
   text-align: center;
 }
+
+/* ===== Fixed header offset =====
+   The header floats over the page. Collection and product sections add their
+   own offset; these templates need one so content doesn't start underneath it. */
+.template-page .main-content,
+.template-cart .main-content,
+.template-search .main-content,
+.template-404 .main-content,
+.template-blog .main-content,
+.template-article .main-content,
+.template-list-collections .main-content {
+  padding-top: 5.5rem;
+}

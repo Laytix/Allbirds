@@ -52,7 +52,7 @@
     {{ content_for_header }}
   </head>
 
-  <body>
+  <body class="template-{{ template.name }}">
     {% sections 'header-group' %}
 
     {% render 'cart-drawer' %}
@@ -61,7 +61,9 @@
 
     {% render 'size-guide-modal' %}
 
-    {{ content_for_layout }}
+    <main id="MainContent" class="main-content">
+      {{ content_for_layout }}
+    </main>
 
     {% sections 'footer-group' %}
 

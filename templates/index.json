@@ -18,9 +18,9 @@
         "eyebrow": "Introducing the Collection",
         "heading": "No More Business As Usual",
         "button_1_label": "Shop Men",
-        "collection_1": "",
+        "collection_1": "men",
         "button_2_label": "Shop Women",
-        "collection_2": ""
+        "collection_2": "women"
       }
     },
     "featured_collections_khyqxF": {
@@ -29,19 +29,19 @@
       "settings": {
         "image_1": "shopify://shop_images/26Q1_VaristyAiry_Site_Homepage_CategoryRow-01_Desktop-Mobile_2x3_01_PDP.webp",
         "title_1": "Men",
-        "col_1_a": "",
+        "col_1_a": "men",
         "col_1_b": "",
         "image_2": "shopify://shop_images/26Q1_VaristyAiry_Site_Homepage_CategoryRow-01_Desktop-Mobile_2x3_02_PDP.webp",
         "title_2": "Women",
-        "col_2_a": "",
+        "col_2_a": "women",
         "col_2_b": "",
         "image_3": "shopify://shop_images/26Q1_VaristyAiry_Site_Homepage_CategoryRow-01_Desktop-Mobile_2x3_03_PDP_v2.webp",
         "title_3": "Accessories",
-        "col_3_a": "",
+        "col_3_a": "accessories",
         "col_3_b": "",
         "image_4": "shopify://shop_images/26Q1_VaristyAiry_Site_Homepage_CategoryRow-01_Desktop-Mobile_2x3_04_PDP.webp",
         "title_4": "Sale",
-        "col_4_a": "",
+        "col_4_a": "sale",
         "col_4_b": ""
       }
     },

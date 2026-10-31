@@ -50,7 +50,7 @@
       <template x-for="item in $store.cart.items" :key="item.key">
         <div class="cart-drawer__item">
           <div class="cart-drawer__thumb">
-            <img :src="item.image" :alt="item.title">
+            <img :src="item.image" :alt="item.title" width="64" height="64">
           </div>
           <div class="cart-drawer__item-info">
             <p class="cart-drawer__item-title" x-text="item.product_title"></p>
