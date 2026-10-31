@@ -5,10 +5,6 @@
       <p class="featured-collections__eyebrow">{{ section.settings.eyebrow | default: 'Shop by category' }}</p>
       <h2 class="featured-collections__heading">{{ section.settings.heading | default: 'Find your everyday pair' }}</h2>
     </div>
-
-    {%- if section.settings.intro != blank -%}
-      <p class="featured-collections__intro">{{ section.settings.intro }}</p>
-    {%- endif -%}
   </div>
 
   {%- for i in (1..4) -%}
@@ -134,14 +130,6 @@
     font-weight: 400;
     color: var(--color-ink);
     text-wrap: balance;
-  }
-
-  .featured-collections__intro {
-    margin: 0 0 0.4rem;
-    max-width: 36ch;
-    font-size: 0.9375rem;
-    line-height: 1.65;
-    color: var(--color-muted);
   }
 
   .featured-collections__item {
@@ -294,10 +282,6 @@
       gap: 1.25rem;
       padding: 3.25rem 0.25rem 1.75rem;
     }
-
-    .featured-collections__intro {
-      max-width: 48ch;
-    }
   }
 
   /* Tablet: 2 columns */
@@ -349,12 +333,6 @@
       "id": "heading",
       "label": "Heading",
       "default": "Find your everyday pair"
-    },
-    {
-      "type": "textarea",
-      "id": "intro",
-      "label": "Intro",
-      "default": "Four edits, one point of view. Considered essentials for wherever the day takes you."
     },
     {
       "type": "header",
