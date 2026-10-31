@@ -320,6 +320,21 @@
     min-width: 0;
   }
 
+  @media (max-width: 380px) {
+    header {
+      padding: 0 1rem;
+    }
+
+    /* Keep the wordmark whole on small phones; account stays in the menu */
+    header .header__icons shopify-account {
+      display: none;
+    }
+
+    header .header__title {
+      font-size: 1.4rem;
+    }
+  }
+
   header button {
     background: none;
     border: none;

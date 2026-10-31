@@ -228,7 +228,7 @@
     padding: 2.5rem 1.5rem 3rem;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 1024px) {
     .site-footer__main {
       grid-template-columns: minmax(280px, 2fr) 3fr;
       grid-template-areas:
@@ -336,6 +336,17 @@
     opacity: 0.6;
   }
 
+  @media (max-width: 480px) {
+    .site-footer__input {
+      padding: 1rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    .site-footer__btn {
+      padding: 1rem 1rem;
+    }
+  }
+
   .site-footer__newsletter-success {
     padding: 3rem 0;
     font-size: 1.125rem;
@@ -352,8 +363,8 @@
 
   @media (min-width: 768px) {
     .site-footer__columns {
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 3rem;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
     }
   }
 

@@ -432,6 +432,36 @@
     outline-offset: 3px;
   }
 
+  /* ── Tablet — keep the right panel, compact the type ── */
+  @media (min-width: 641px) and (max-width: 900px) {
+    .hero-slider__overlay-inner {
+      padding: 1.5rem 2rem 3rem;
+    }
+
+    .hero-slider__eyebrow {
+      margin-bottom: 0.9rem;
+      font-size: 0.625rem;
+      letter-spacing: 0.18em;
+    }
+
+    .hero-slider__heading {
+      margin-bottom: 0.9rem;
+      font-size: clamp(2rem, 5.2vw, 2.6rem);
+    }
+
+    .hero-slider__subheading {
+      margin-bottom: 1.1rem;
+      font-size: 0.8125rem;
+      line-height: 1.55;
+    }
+
+    .hero-slider__btn {
+      min-height: 2.5rem;
+      padding: 0 1.25rem;
+      font-size: 0.625rem;
+    }
+  }
+
   /* ── Mobile — 4:5 portrait ── */
   @media (max-width: 640px) {
     .hero-slider {
@@ -492,6 +522,27 @@
 
     .hero-slider__buttons {
       width: 100%;
+    }
+  }
+
+  /* ── Very small phones — protect the eyebrow from the floating header ── */
+  @media (max-width: 360px) {
+    .hero-slider__overlay-inner {
+      padding-bottom: 3rem;
+    }
+
+    .hero-slider__heading {
+      margin-bottom: 0.8rem;
+      font-size: clamp(1.95rem, 9.4vw, 2.25rem);
+    }
+
+    .hero-slider__eyebrow {
+      margin-bottom: 0.8rem;
+    }
+
+    .hero-slider__subheading {
+      margin-bottom: 1.2rem;
+      font-size: 0.8125rem;
     }
   }
 
