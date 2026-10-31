@@ -1,4 +1,16 @@
 <div class="featured-collections full-width">
+
+  <div class="featured-collections__header">
+    <div class="featured-collections__header-main">
+      <p class="featured-collections__eyebrow">{{ section.settings.eyebrow | default: 'Shop by category' }}</p>
+      <h2 class="featured-collections__heading">{{ section.settings.heading | default: 'Find your everyday pair' }}</h2>
+    </div>
+
+    {%- if section.settings.intro != blank -%}
+      <p class="featured-collections__intro">{{ section.settings.intro }}</p>
+    {%- endif -%}
+  </div>
+
   {%- for i in (1..4) -%}
     {%- assign image_setting  = 'image_'  | append: i -%}
     {%- assign title_setting  = 'title_'  | append: i -%}
@@ -23,9 +35,17 @@
     {%- assign card_link = col_a | default: col_b -%}
     {%- assign card_url  = card_link.url | default: routes.all_products_collection_url -%}
 
+    {%- comment -%} Only show an extra link row when it adds information {%- endcomment -%}
+    {%- assign show_links = false -%}
+    {%- if has_col_b -%}
+      {%- assign show_links = true -%}
+    {%- endif -%}
+    {%- if has_col_a and col_a.title != card_title -%}
+      {%- assign show_links = true -%}
+    {%- endif -%}
+
     <div class="featured-collections__item">
 
-      {%- comment -%} Image — wrapped in the card link {%- endcomment -%}
       <a
         class="featured-collections__card-link"
         href="{{ card_url }}"
@@ -47,31 +67,28 @@
         {%- endif -%}
       </a>
 
-      {%- comment -%} Overlay with title + hover collection links {%- endcomment -%}
-      <div class="featured-collections__overlay">
+      <div class="featured-collections__overlay" aria-hidden="true"></div>
 
-        {%- comment -%} Default label — fades up and out on hover {%- endcomment -%}
-        <div class="featured-collections__default">
-          <a href="{{ card_url }}" class="featured-collections__pill">{{ card_title }}</a>
+      <div class="featured-collections__content">
+        {%- if show_links -%}
+          <div class="featured-collections__links">
+            {%- if has_col_a -%}
+              <a href="{{ col_a.url }}">{{ col_a.title }}</a>
+            {%- endif -%}
+            {%- if has_col_b -%}
+              <a href="{{ col_b.url }}">{{ col_b.title }}</a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        <div class="featured-collections__title-row">
+          <a href="{{ card_url }}" class="featured-collections__title">{{ card_title }}</a>
+          <span class="featured-collections__arrow" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+          </span>
         </div>
-
-        {%- comment -%} Hover state — collection(s) fade up into view {%- endcomment -%}
-        <div class="featured-collections__hover">
-          {%- if has_col_a -%}
-            <a href="{{ col_a.url }}" class="featured-collections__pill featured-collections__pill--link">
-              {{ col_a.title }}
-            </a>
-          {%- endif -%}
-          {%- if has_col_b -%}
-            <a href="{{ col_b.url }}" class="featured-collections__pill featured-collections__pill--link">
-              {{ col_b.title }}
-            </a>
-          {%- endif -%}
-          {%- unless has_col_a or has_col_b -%}
-            <a href="{{ card_url }}" class="featured-collections__pill">{{ card_title }}</a>
-          {%- endunless -%}
-        </div>
-
       </div>
     </div>
   {%- endfor -%}
@@ -84,6 +101,47 @@
     gap: 0.75rem;
     margin: 0.75rem;
     width: calc(100% - 1.5rem);
+  }
+
+  /* ===== Section header ===== */
+  .featured-collections__header {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2.5rem;
+    padding: 4.25rem 0.25rem 2.25rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .featured-collections__eyebrow {
+    margin: 0 0 0.9rem;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .featured-collections__heading {
+    margin: 0;
+    max-width: 14ch;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 3.4vw, 3.25rem);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    font-weight: 400;
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+
+  .featured-collections__intro {
+    margin: 0 0 0.4rem;
+    max-width: 36ch;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--color-muted);
   }
 
   .featured-collections__item {
@@ -109,11 +167,11 @@
     object-fit: cover;
     object-position: center;
     display: block;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .featured-collections__item:hover .featured-collections__img {
-    transform: scale(1.04);
+    transform: scale(1.05);
   }
 
   .featured-collections__placeholder {
@@ -122,94 +180,152 @@
     background: linear-gradient(135deg, #1c1c1c 0%, #2e2e2e 50%, #1c1c1c 100%);
   }
 
-  /* ── Overlay — subtle tint, deepens on hover ── */
+  /* ── Bottom gradient — carries the label ── */
   .featured-collections__overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.18);
-    transition: background 0.4s ease;
-    /* Let clicks pass through to the card link; pills re-enable themselves */
+    background: linear-gradient(
+      to top,
+      rgba(15, 12, 9, 0.8) 0%,
+      rgba(15, 12, 9, 0.28) 42%,
+      rgba(15, 12, 9, 0) 68%
+    );
+    opacity: 0.92;
     pointer-events: none;
+    transition: opacity 0.4s ease;
   }
 
   .featured-collections__item:hover .featured-collections__overlay {
-    background: rgba(0, 0, 0, 0.38);
+    opacity: 1;
   }
 
-  /* ── Both layers: centered, absolutely positioned ── */
-  .featured-collections__default,
-  .featured-collections__hover {
+  /* ── Bottom-left label + circular arrow ── */
+  .featured-collections__content {
     position: absolute;
-    top: 50%;
     left: 0;
     right: 0;
+    bottom: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    transition: opacity 0.38s ease, transform 0.38s ease, visibility 0s 0.38s;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 1.35rem 1.35rem 1.4rem;
+    pointer-events: none;
   }
 
-  /* Default: centered, fully visible */
-  .featured-collections__default {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(-50%);
-    transition: opacity 0.38s ease, transform 0.38s ease, visibility 0s;
-  }
-
-  /* Hover layer: starts centered but shifted down slightly, hidden */
-  .featured-collections__hover {
+  .featured-collections__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
     opacity: 0;
-    visibility: hidden;
-    transform: translateY(calc(-50% + 12px));
+    transform: translateY(8px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
   }
 
-  /* On hover: default fades up and out */
-  .featured-collections__item:hover .featured-collections__default {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(calc(-50% - 12px));
-    transition: opacity 0.38s ease, transform 0.38s ease, visibility 0s 0.38s;
-  }
-
-  /* On hover: collection links fade up into center */
-  .featured-collections__item:hover .featured-collections__hover {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(-50%);
-    transition: opacity 0.38s ease, transform 0.38s ease, visibility 0s;
-  }
-
-  /* ── Pill base ── */
-  .featured-collections__pill {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem 1.25rem;
-    border-radius: 9999px;
-    border: 1.5px solid rgba(255, 255, 255, 0.85);
-    background: transparent;
-    color: #ffffff;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    white-space: nowrap;
-    text-decoration: none;
-    /* Re-enable clicks on top of the click-through overlay */
+  .featured-collections__links a {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.82);
+    text-decoration: underline;
+    text-underline-offset: 0.35em;
     pointer-events: auto;
   }
 
-  /* Collection link pills get a subtle fill on their own hover */
-  .featured-collections__pill--link:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: #ffffff;
+  .featured-collections__item:hover .featured-collections__links,
+  .featured-collections__item:focus-within .featured-collections__links {
+    opacity: 1;
+    transform: none;
+  }
+
+  .featured-collections__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .featured-collections__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2vw, 1.9rem);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+    text-decoration: none;
+    pointer-events: auto;
+    text-shadow: 0 1px 18px rgba(0, 0, 0, 0.25);
+  }
+
+  .featured-collections__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: none;
+    background: rgba(16, 12, 9, 0.45);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    color: #ffffff;
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .featured-collections__item:hover .featured-collections__arrow {
+    background: #f3efe7;
+    border-color: #f3efe7;
+    color: #1a1a1a;
+    transform: translateX(2px);
+  }
+
+  .featured-collections__title:focus-visible,
+  .featured-collections__links a:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 900px) {
+    .featured-collections__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.25rem;
+      padding: 3.25rem 0.25rem 1.75rem;
+    }
+
+    .featured-collections__intro {
+      max-width: 48ch;
+    }
   }
 
   /* Tablet: 2 columns */
   @media (max-width: 768px) {
     .featured-collections {
       grid-template-columns: repeat(2, 1fr);
+    }
+
+    .featured-collections__header {
+      padding-top: 2.75rem;
+    }
+
+    .featured-collections__heading {
+      font-size: clamp(2rem, 7vw, 2.5rem);
+    }
+
+    .featured-collections__content {
+      gap: 0.6rem;
+      padding: 1rem;
+    }
+
+    .featured-collections__title {
+      font-size: 1.25rem;
+    }
+
+    .featured-collections__arrow {
+      width: 2rem;
+      height: 2rem;
     }
   }
 {% endstylesheet %}
@@ -218,6 +334,28 @@
 {
   "name": "Featured Collections",
   "settings": [
+    {
+      "type": "header",
+      "content": "Section header"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Shop by category"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Find your everyday pair"
+    },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Intro",
+      "default": "Four edits, one point of view. Considered essentials for wherever the day takes you."
+    },
     {
       "type": "header",
       "content": "Card 1"

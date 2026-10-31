@@ -104,23 +104,21 @@
 
   </div>
 
-  {%- comment -%} ── Right overlay panel ── {%- endcomment -%}
-  <div class="hero-slider__overlay" aria-label="Featured content">
+  {%- comment -%} ── Editorial overlay panel ── {%- endcomment -%}
+  <div class="hero-slider__overlay">
     <div class="hero-slider__overlay-inner">
 
-      {%- comment -%}
-        Eyebrow: mirrors Allbirds' p.z-content.font-mono.text-xs/5.font-medium.tracking-widest.uppercase
-      {%- endcomment -%}
       <p class="hero-slider__eyebrow">
         {{- section.settings.eyebrow | default: 'Introducing the Collection' -}}
       </p>
 
-      {%- comment -%}
-        Heading: mirrors Allbirds' h1.z-content.text-2xl/8.tracking-wide
-      {%- endcomment -%}
       <h1 class="hero-slider__heading">
         {{- section.settings.heading | default: 'No More Business As Usual' -}}
       </h1>
+
+      {%- if section.settings.subheading != blank -%}
+        <p class="hero-slider__subheading">{{ section.settings.subheading }}</p>
+      {%- endif -%}
 
       <div class="hero-slider__buttons">
 
@@ -173,8 +171,8 @@
     aspect-ratio: 16 / 9;
     max-height: 72vh;
     overflow: hidden;
-    background: #111111;
-    border-radius: 1rem;
+    background: #14110e;
+    border-radius: 1.25rem;
     margin: 0.75rem;
     width: calc(100% - 1.5rem);
   }
@@ -299,114 +297,139 @@
     top: 0;
     right: 0;
     height: 100%;
-    /* ~38% wide — enough for two pill buttons side-by-side */
-    width: clamp(280px, 38%, 440px);
+    /* Wide enough for the editorial headline to breathe */
+    width: clamp(340px, 46%, 600px);
     display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    align-items: flex-end;
     z-index: 5;
-    /*
-      Allbirds-style: generous dark fade from the right edge inward.
-      No hard border — seamlessly dissolves into the photo.
-    */
     background: linear-gradient(
       to left,
-      rgba(0, 0, 0, 0.65) 0%,
-      rgba(0, 0, 0, 0.48) 55%,
-      rgba(0, 0, 0, 0) 100%
+      rgba(16, 12, 9, 0.9) 0%,
+      rgba(16, 12, 9, 0.72) 52%,
+      rgba(16, 12, 9, 0) 100%
     );
   }
 
   .hero-slider__overlay-inner {
-    padding: 2.5rem 2.5rem 2.5rem 1.5rem;
+    width: 100%;
+    padding: 2.5rem 3.25rem 4.5rem 3rem;
     display: flex;
     flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
     color: #ffffff;
+    animation: hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
   }
 
-  /*
-    Eyebrow — mirrors:
-    p.font-mono.text-xs/5.font-medium.tracking-widest.uppercase
-    text-xs  = 0.75rem
-    /5       = line-height 1.25rem
-    tracking-widest = 0.1em
-  */
+  @keyframes hero-rise {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   .hero-slider__eyebrow {
     position: relative;
     z-index: 1;
-    margin-bottom: 1rem;       /* mb-4 */
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 0.85rem;
+    margin: 0 0 1.35rem;
     font-family: var(--font-mono, ui-monospace, monospace);
-    font-size: 0.75rem;        /* text-xs */
-    line-height: 1.25rem;      /* /5 */
-    font-weight: 500;          /* font-medium */
-    letter-spacing: 0.1em;     /* tracking-widest */
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    font-weight: 500;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.72);
   }
 
-  /*
-    Heading — mirrors:
-    h1.text-2xl/8.tracking-wide
-    text-2xl = 1.5rem
-    /8       = line-height 2rem
-    tracking-wide = 0.025em
-  */
+  .hero-slider__eyebrow::before {
+    content: '';
+    width: 2.25rem;
+    height: 1px;
+    flex: none;
+    background: rgba(255, 255, 255, 0.5);
+  }
+
   .hero-slider__heading {
     position: relative;
     z-index: 1;
-    margin-bottom: 1.5rem;     /* mb-6 */
-    font-size: 1.5rem;         /* text-2xl */
-    line-height: 2rem;         /* /8 */
-    letter-spacing: 0.025em;   /* tracking-wide */
+    margin: 0 0 1.25rem;
+    max-width: 11ch;
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 4.6vw, 4.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
     font-weight: 400;
     color: #ffffff;
+    text-wrap: balance;
+    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.28);
+  }
+
+  .hero-slider__subheading {
+    position: relative;
+    z-index: 1;
+    margin: 0 0 2rem;
+    max-width: 32ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.74);
   }
 
   /* ── Buttons — side by side ── */
   .hero-slider__buttons {
+    position: relative;
+    z-index: 1;
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
     gap: 0.625rem;
-  }
-
-  /* Shared pill base */
+  }  /* Shared pill base */
   .hero-slider__btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.6875rem 1.75rem;   /* Allbirds ~11px 28px */
-    border-radius: 9999px;        /* pill */
-    font-size: 0.875rem;          /* text-sm */
+    min-height: 2.875rem;
+    padding: 0 1.9rem;
+    border-radius: 9999px;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.6875rem;
     font-weight: 500;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     text-decoration: none;
     text-align: center;
-    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
     cursor: pointer;
     white-space: nowrap;
   }
 
-  /* Primary — white fill, black text */
+  /* Primary — warm paper fill, ink text */
   .hero-slider__btn--primary {
-    background: #ffffff;
-    color: #000000;
-    border: 1.5px solid #ffffff;
+    background: #f3efe7;
+    color: #1a1a1a;
+    border: 1px solid #f3efe7;
   }
 
   .hero-slider__btn--primary:hover {
-    background: rgba(255, 255, 255, 0.88);
+    background: #ffffff;
+    border-color: #ffffff;
   }
 
-  /* Secondary — outlined white */
+  /* Secondary — hairline outline */
   .hero-slider__btn--secondary {
     background: transparent;
     color: #ffffff;
-    border: 1.5px solid rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.5);
   }
 
   .hero-slider__btn--secondary:hover {
     border-color: #ffffff;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .hero-slider__btn:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
   }
 
   /* ── Mobile — 4:5 portrait ── */
@@ -414,7 +437,7 @@
     .hero-slider {
       aspect-ratio: 4 / 5;
       max-height: 100svh;
-      border-radius: 0.75rem;
+      border-radius: 1rem;
       margin: 0.75rem;
       width: calc(100% - 1.5rem);
     }
@@ -428,24 +451,58 @@
       align-items: flex-end;
       background: linear-gradient(
         to top,
-        rgba(0, 0, 0, 0.72) 0%,
-        rgba(0, 0, 0, 0.42) 55%,
-        rgba(0, 0, 0, 0) 100%
+        rgba(16, 12, 9, 0.92) 0%,
+        rgba(16, 12, 9, 0.55) 58%,
+        rgba(16, 12, 9, 0) 100%
       );
     }
 
     .hero-slider__overlay-inner {
-      padding: 1.25rem 1.25rem 3rem;
-      width: 100%;
+      padding: 1.5rem 1.25rem 3.5rem;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .hero-slider__eyebrow {
+      flex-direction: row;
+      margin-bottom: 1.1rem;
+      font-size: 0.625rem;
+      letter-spacing: 0.18em;
+    }
+
+    .hero-slider__eyebrow::before {
+      width: 1.5rem;
+    }
+
+    .hero-slider__heading {
+      margin-bottom: 1rem;
+      font-size: clamp(2.35rem, 10.5vw, 3.25rem);
+    }
+
+    .hero-slider__subheading {
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
     }
 
     .hero-slider__btn {
       flex: 1;
-      padding: 0.6875rem 1rem;
+      min-height: 2.75rem;
+      padding: 0 1rem;
     }
 
-    /* Progress bars stay at the bottom (desktop placement) — the overlay's
-       3rem bottom padding keeps the text panel clear of them */
+    .hero-slider__buttons {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-slider__overlay-inner {
+      animation: none;
+    }
+
+    .hero-slider__slide.is-active .hero-slider__img {
+      animation: none;
+    }
   }
 
 {% endstylesheet %}
@@ -483,6 +540,12 @@
       "id": "heading",
       "label": "Heading",
       "default": "No More Business As Usual"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Supporting line",
+      "default": "Considered essentials for wherever the day takes you."
     },
     {
       "type": "header",

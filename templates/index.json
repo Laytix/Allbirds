@@ -15,8 +15,9 @@
       "settings": {
         "image_1": "shopify://shop_images/26Q1_VarsityAiry_Site_Homepage_Hero_Desktop_16x9_v4_022426345.webp",
         "image_2": "shopify://shop_images/26Q1_Terralux_Site_Homepage_Hero_Desktop_16x9_Mens.webp",
-        "eyebrow": "Introducing the Collection",
+        "eyebrow": "Autumn / Winter 2026",
         "heading": "No More Business As Usual",
+        "subheading": "Considered essentials for wherever the day takes you.",
         "button_1_label": "Shop Men",
         "collection_1": "men",
         "button_2_label": "Shop Women",
@@ -27,6 +28,9 @@
       "type": "featured-collections",
       "name": "Featured Collections",
       "settings": {
+        "eyebrow": "Shop by category",
+        "heading": "Find your everyday pair",
+        "intro": "Four edits, one point of view. Made for the everyday, and the days that aren't.",
         "image_1": "shopify://shop_images/26Q1_VaristyAiry_Site_Homepage_CategoryRow-01_Desktop-Mobile_2x3_01_PDP.webp",
         "title_1": "Men",
         "col_1_a": "men",
@@ -50,9 +54,10 @@
       "name": "Product Slider",
       "settings": {
         "collection": "best-sellers",
+        "eyebrow": "Most wanted",
         "heading": "Best Sellers",
         "products_to_show": 8,
-        "card_background": "#FFFFFF"
+        "card_background": "#F7F4EE"
       }
     }
   },

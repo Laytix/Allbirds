@@ -1,8 +1,9 @@
 {%- comment -%}
   Section: Product Slider
-  Description: Allbirds-style "Best Sellers" carousel — mono underlined label,
-  circular arrows top-right, scroll-snap card row with the last card peeking.
-  Cards come from a picked collection; "NEW" badge renders for products tagged `new`.
+  Description: Editorial "Best Sellers" carousel — serif heading with a mono
+  eyebrow, a View all link, circular arrows top-right, and a scroll-snap card
+  row with the last card peeking. Cards come from a picked collection; the
+  "NEW" badge renders for products tagged `new`.
 {%- endcomment -%}
 
 {%- assign col = section.settings.collection -%}
@@ -15,31 +16,40 @@
     style="--ps-card-bg: {{ section.settings.card_background }};"
   >
     <div class="product-slider__header">
-      <h2 class="product-slider__heading">{{ section.settings.heading }}</h2>
+      <div class="product-slider__heading-group">
+        <p class="product-slider__eyebrow">{{ section.settings.eyebrow | default: 'Most wanted' }}</p>
+        <h2 class="product-slider__heading">{{ section.settings.heading }}</h2>
+      </div>
 
-      <div class="product-slider__nav">
-        <button
-          type="button"
-          class="product-slider__arrow"
-          data-ps-prev
-          aria-label="Previous products"
-          disabled
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
-        </button>
-        <button
-          type="button"
-          class="product-slider__arrow"
-          data-ps-next
-          aria-label="Next products"
-          disabled
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M9 6l6 6-6 6"/>
-          </svg>
-        </button>
+      <div class="product-slider__actions">
+        <a href="{{ col.url }}" class="product-slider__view-all">
+          View all <span aria-hidden="true">↗</span>
+        </a>
+
+        <div class="product-slider__nav">
+          <button
+            type="button"
+            class="product-slider__arrow"
+            data-ps-prev
+            aria-label="Previous products"
+            disabled
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
+          <button
+            type="button"
+            class="product-slider__arrow"
+            data-ps-next
+            aria-label="Next products"
+            disabled
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 6l6 6-6 6"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -64,7 +74,7 @@
   .product-slider {
     --ps-gap: 1rem;
     --ps-pv: 1.3;
-    padding-block: 3.5rem 4rem;
+    padding-block: 4.5rem 5rem;
   }
 
   @media (min-width: 640px) {
@@ -82,22 +92,55 @@
   /* ===== Header row ===== */
   .product-slider__header {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
+    gap: 2rem;
     padding-inline: var(--page-margin);
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .product-slider__eyebrow {
+    margin: 0 0 0.7rem;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-muted);
   }
 
   .product-slider__heading {
-    font-family: var(--font-mono, ui-monospace, monospace);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.4em;
     margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 3.2vw, 3rem);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    font-weight: 400;
+    color: var(--color-ink);
+  }
+
+  .product-slider__actions {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .product-slider__view-all {
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid var(--color-ink);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .product-slider__view-all:hover {
+    opacity: 0.55;
   }
 
   .product-slider__nav {
@@ -109,10 +152,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
     border-radius: 50%;
-    border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+    border: 1px solid var(--color-line);
     background: transparent;
     color: var(--color-foreground);
     cursor: pointer;
@@ -162,6 +205,33 @@
     font-size: 0.9375rem;
     opacity: 0.6;
   }
+
+  @media (max-width: 640px) {
+    .product-slider {
+      padding-block: 3.5rem 4rem;
+    }
+
+    .product-slider__header {
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .product-slider__heading {
+      font-size: clamp(2rem, 8vw, 2.5rem);
+    }
+
+    .product-slider__actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .product-slider__arrow {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -172,6 +242,12 @@
       "type": "collection",
       "id": "collection",
       "label": "Collection"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Most wanted"
     },
     {
       "type": "text",

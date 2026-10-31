@@ -7,21 +7,21 @@
 
 <div
   class="footer-column"
-  data-accordion="collapse"
+  x-data="{ open: false }"
   {{ block.shopify_attributes }}
 >
   {%- if block.settings.heading != blank -%}
     <button
       type="button"
       class="footer-column__toggle"
-      data-accordion-target="#footer-col-{{ block.id }}"
-      aria-expanded="false"
+      :aria-expanded="open ? 'true' : 'false'"
       aria-controls="footer-col-{{ block.id }}"
+      @click="open = !open"
     >
       <span>{{ block.settings.heading }}</span>
       <svg
-        data-accordion-icon
         class="footer-column__toggle-icon"
+        :class="open && 'is-open'"
         width="14"
         height="14"
         viewBox="0 0 24 24"
@@ -38,18 +38,41 @@
     </h3>
   {%- endif -%}
 
+  {%- assign column_heading = block.settings.heading | downcase -%}
   <ul
     id="footer-col-{{ block.id }}"
     class="footer-column__links"
-    hidden
+    x-show="open"
+    x-cloak
   >
-    {% for link in block.settings.menu.links %}
-      <li>
-        <a href="{{ link.url }}" class="footer-column__link">
-          {{ link.title }}
-        </a>
-      </li>
-    {% endfor %}
+    {%- if block.settings.menu != blank -%}
+      {% for link in block.settings.menu.links %}
+        <li>
+          <a href="{{ link.url }}" class="footer-column__link">
+            {{ link.title }}
+          </a>
+        </li>
+      {% endfor %}
+    {%- else -%}
+      {%- comment -%} Demo fallbacks when no menu is assigned {%- endcomment -%}
+      {%- case column_heading -%}
+        {%- when 'help' -%}
+          <li><a href="/policies/shipping-policy" class="footer-column__link">Shipping &amp; returns</a></li>
+          <li><a href="/policies/refund-policy" class="footer-column__link">Refund policy</a></li>
+          <li><a href="/policies/privacy-policy" class="footer-column__link">Privacy policy</a></li>
+          <li><a href="/policies/terms-of-service" class="footer-column__link">Terms of service</a></li>
+        {%- when 'shop' -%}
+          <li><a href="{{ routes.all_products_collection_url }}" class="footer-column__link">Shop all</a></li>
+          <li><a href="/collections/men" class="footer-column__link">Men</a></li>
+          <li><a href="/collections/women" class="footer-column__link">Women</a></li>
+          <li><a href="/collections/accessories" class="footer-column__link">Accessories</a></li>
+        {%- when 'company' -%}
+          <li><a href="/pages/about" class="footer-column__link">Our story</a></li>
+          <li><a href="/pages/sustainability" class="footer-column__link">Sustainability</a></li>
+          <li><a href="/blogs/news" class="footer-column__link">Journal</a></li>
+          <li><a href="/pages/contact" class="footer-column__link">Contact</a></li>
+      {%- endcase -%}
+    {%- endif -%}
   </ul>
 </div>
 
@@ -86,12 +109,11 @@
     flex-shrink: 0;
   }
 
-  .footer-column__toggle:hover .footer-column__toggle-icon {
-    opacity: 1;
+  .footer-column__toggle-icon.is-open {
+    transform: rotate(180deg);
   }
 
-  /* Flowbite rotates the icon when open */
-  [data-accordion].footer-column [aria-expanded="true"] .footer-column__toggle-icon {
+  .footer-column__toggle:hover .footer-column__toggle-icon {
     opacity: 1;
   }
 
@@ -141,17 +163,6 @@
     .footer-column__links {
       display: block !important;
       padding-bottom: 0;
-    }
-
-    .footer-column__links[hidden] {
-      display: block !important;
-    }
-  }
-
-  /* Remove the hidden attribute visually on desktop */
-  @media (min-width: 768px) {
-    .footer-column[data-accordion="collapse"] [hidden] {
-      display: block !important;
     }
   }
 {% endstylesheet %}
